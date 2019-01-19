@@ -1,0 +1,53 @@
+<script type="text/javascript">
+  RED.nodes.registerType('presence-faker', {
+    category: 'smart home',
+    color: '#FFAAAA',
+    defaults: {
+      name: { value: '' },
+      cron: { value: '* * 1-5 12:00' },
+      onPayload: { value: 'true' },
+      onTopic: { value: '' },
+      offPayload: { value: 'false' },
+      offTopic: { value: '' },
+    },
+    inputs: 1,
+    outputs: 1,
+    icon: 'light.png',
+    label: function() {
+      return this.name || 'presence-faker'
+    },
+  })
+</script>
+
+<script type="text/x-red" data-template-name="presence-faker">
+  <div class="form-row">
+      <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+      <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-cron"><i class="icon-tag"></i> Cron</label>
+    <input type="text" id="node-input-cron" placeholder="Cron">
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-onPayload"><i class="icon-tag"></i> ON payload</label>
+    <input type="text" id="node-input-onPayload" placeholder="">
+  </div>
+  <div class="form-row">
+    <label for="node-input-onTopic"><i class="icon-tag"></i> ON topic</label>
+    <input type="text" id="node-input-onTopic" placeholder="">
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-offPayload"><i class="icon-tag"></i> OFF payload</label>
+    <input type="text" id="node-input-offPayload" placeholder="">
+  </div>
+  <div class="form-row">
+    <label for="node-input-offTopic"><i class="icon-tag"></i> OFF topic</label>
+    <input type="text" id="node-input-offTopic" placeholder="">
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="presence-faker">
+  <p>A simple node that converts the message payloads into all lower-case characters</p>
+</script>
