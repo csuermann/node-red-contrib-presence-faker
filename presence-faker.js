@@ -20,9 +20,20 @@ function createSchedule (node, config) {
   const count = calcRandomCount()
   node.warn('randomCount: ' + count)
 
+  const blocks = Array()
+
   for (let i = 1; i <= count; i++) {
-    node.warn(`block ${i}: ` + calcRandomDuration())
+    let block = {
+      blockId: i,
+      duration: calcRandomDuration()
+    }
+
+    blocks.push(block)
+    node.warn(block)
   }
+
+  let sumDurations = blocks.reduce((prev, curr) => prev + curr.duration, 0)
+  node.warn(`SUM: ${sumDurations} minutes`)
 
   // node.send(msg)
 
