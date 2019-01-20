@@ -9,5 +9,9 @@
     "nodes": {
       "presence-faker": "presence-faker.js"
     }
+  },
+  "dependencies": {
+    "dayjs": "^1.8.0",
+    "random": "^2.0.13"
   }
 }

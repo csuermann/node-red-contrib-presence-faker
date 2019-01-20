@@ -4,11 +4,16 @@
     color: '#FFAAAA',
     defaults: {
       name: { value: '' },
-      cron: { value: '* * 1-5 12:00' },
-      onPayload: { value: 'true' },
+      onPayload: { value: 'on', required: true },
       onTopic: { value: '' },
-      offPayload: { value: 'false' },
+      offPayload: { value: 'off', required: true },
       offTopic: { value: '' },
+      windowBegin: { value: '07:30', required: true },
+      windowEnd: { value: '17:30', required: true },
+      minDuration: { value: 5, required: true },
+      maxDuration: { value: 90, required: true },
+      minCount: { value: 5, required: true },
+      maxCount: { value: 5, required: true },
     },
     inputs: 1,
     outputs: 1,
@@ -24,9 +29,35 @@
       <label for="node-input-name"><i class="icon-tag"></i> Name</label>
       <input type="text" id="node-input-name" placeholder="Name">
   </div>
+
   <div class="form-row">
-    <label for="node-input-cron"><i class="icon-tag"></i> Cron</label>
-    <input type="text" id="node-input-cron" placeholder="Cron">
+    <label for="node-input-windowBegin"><i class="icon-tag"></i> window begin</label>
+    <input type="text" id="node-input-windowBegin" placeholder="">
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-windowEnd"><i class="icon-tag"></i> window end</label>
+    <input type="text" id="node-input-windowEnd" placeholder="">
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-minDuration"><i class="icon-tag"></i> min duration</label>
+    <input type="text" id="node-input-minDuration" placeholder="">
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-maxDuration"><i class="icon-tag"></i> max duration</label>
+    <input type="text" id="node-input-maxDuration" placeholder="">
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-minCount"><i class="icon-tag"></i> min count</label>
+    <input type="text" id="node-input-minCount" placeholder="">
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-maxCount"><i class="icon-tag"></i> max count</label>
+    <input type="text" id="node-input-maxCount" placeholder="">
   </div>
 
   <div class="form-row">
@@ -49,5 +80,12 @@
 </script>
 
 <script type="text/x-red" data-help-name="presence-faker">
-  <p>A simple node that converts the message payloads into all lower-case characters</p>
+  <p>Node that fakes presence in a smart home by switching devices (e.g. lights) on and off at random times.</p>
+  <h3>Outputs</h3>
+      <dl class="message-properties">
+      <dt>payload
+          <span class="property-type">string | buffer</span>
+      </dt>
+  <h3>Details</h3>
+  <p>Some more information about the node.</p>
 </script>
