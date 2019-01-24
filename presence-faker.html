@@ -8,19 +8,19 @@
       onTopic: { value: '' },
       offPayload: { value: 'off', required: true },
       offTopic: { value: '' },
-      windowBegin: { value: '07:30', required: true },
-      windowEnd: { value: '17:30', required: true },
-      minDuration: { value: 5, required: true },
-      maxDuration: { value: 90, required: true },
-      minCount: { value: 5, required: true },
-      maxCount: { value: 5, required: true },
+      windowBegin: { value: '07:30:00', required: true },
+      windowEnd: { value: '17:30:00', required: true },
+      minDuration: { value: 60, required: true },
+      maxDuration: { value: 300, required: true },
+      minCount: { value: 4, required: true },
+      maxCount: { value: 8, required: true }
     },
     inputs: 1,
     outputs: 1,
     icon: 'light.png',
     label: function() {
       return this.name || 'presence-faker'
-    },
+    }
   })
 </script>
 

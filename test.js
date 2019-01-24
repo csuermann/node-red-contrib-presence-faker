@@ -10,14 +10,19 @@ let config = {
   onTopic: '',
   offPayload: 'off',
   offTopic: '',
-  windowBegin: '07:30',
-  windowEnd: '23:59',
-  minDuration: 60,
-  maxDuration: 180,
-  minCount: 8,
-  maxCount: 10
+  windowBegin: '00:00:00',
+  windowEnd: '00:59:59',
+  minDuration: 1,
+  maxDuration: 30,
+  minCount: 1,
+  maxCount: 20
 }
 
-let schedule = stripPastBlocks(createSchedule(node, config))
+// let schedule = stripPastBlocks(createSchedule(node, config))
+let schedule = createSchedule(node, config)
 
-console.log(schedule)
+let schedulePrint = schedule.map(el => ({
+  begin: el.beginString,
+  end: el.endString
+}))
+console.log(schedulePrint)
