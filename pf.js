@@ -1,7 +1,7 @@
 const random = require('random')
 const dayjs = require('dayjs')
 
-function createSchedule (node, config) {
+function createSchedule(node, config) {
   const now = dayjs()
 
   const windowBegin = dayjs(now.format('YYYY-MM-DD') + 'T' + config.windowBegin)
@@ -33,7 +33,7 @@ function createSchedule (node, config) {
   let sumOnDurations = onBlocks.reduce((prev, curr) => prev + curr.duration, 0)
   node.warn(`SUM ON: ${sumOnDurations} seconds`)
 
-  const calcDeviation = avgDeviation => {
+  const calcRandomDeviation = avgDeviation => {
     return random.int(-1 * avgDeviation, avgDeviation)
   }
 
@@ -42,12 +42,13 @@ function createSchedule (node, config) {
   sumOffDurations < 0 ? 0 : sumOffDurations
   node.warn(`SUM OFF: ${sumOffDurations} seconds`)
 
-  let avgOffDuration = Math.ceil(sumOffDurations / (count + 1))
+  let avgOffDuration = Math.floor(sumOffDurations / (count + 1))
   let deviation = Math.floor(avgOffDuration * 0.4)
   let lastDeviation = 0
 
   for (let i = count + 1; i > 0; i--) {
-    let currentDeviation = i > 1 ? calcDeviation(deviation) : 0
+    node.warn(i)
+    let currentDeviation = i > 1 ? calcRandomDeviation(deviation) : 0
     let offBlock = {
       isOn: false,
       duration: avgOffDuration + currentDeviation + -1 * lastDeviation
@@ -62,7 +63,7 @@ function createSchedule (node, config) {
   return _calcScheduleTimes(schedule, windowBegin)
 }
 
-function _combineBlocks (offBlocks, onBlocks) {
+function _combineBlocks(offBlocks, onBlocks) {
   let schedule = []
 
   for (let i = 0; i < offBlocks.length; i++) {
@@ -76,7 +77,7 @@ function _combineBlocks (offBlocks, onBlocks) {
   return schedule
 }
 
-function _calcScheduleTimes (schedule, start) {
+function _calcScheduleTimes(schedule, start) {
   schedule.forEach(block => {
     block.beginString = start.format('HH:mm:ss')
     let end = start.add(block.duration, 'second')
@@ -88,7 +89,7 @@ function _calcScheduleTimes (schedule, start) {
   return schedule
 }
 
-function stripPastBlocks (blocks) {
+function stripPastBlocks(blocks) {
   const now = dayjs()
   return blocks.filter(block => {
     let end = block.begin.add(block.duration, 'second')
