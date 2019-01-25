@@ -1,10 +1,5 @@
 const { createSchedule, stripPastBlocks } = require('./pf')
 
-let node = {
-  warn: msg => console.log(msg),
-  send: msg => console.log('send():', msg)
-}
-
 let config = {
   onPayload: 'on',
   onTopic: '',
@@ -18,8 +13,8 @@ let config = {
   maxCount: 20
 }
 
-// let schedule = stripPastBlocks(createSchedule(node, config))
-let schedule = createSchedule(node, config)
+// let schedule = stripPastBlocks(createSchedule(config))
+let schedule = createSchedule(config)
 
 let schedulePrint = schedule.map(el => ({
   begin: el.beginString,

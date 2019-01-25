@@ -1,19 +1,25 @@
 const random = require('random')
 const dayjs = require('dayjs')
 
-function createSchedule (node, config) {
+function createSchedule({
+  windowBegin,
+  windowEnd,
+  minDuration,
+  maxDuration,
+  minCount,
+  maxCount
+}) {
   const now = dayjs()
 
-  const windowBegin = dayjs(now.format('YYYY-MM-DD') + 'T' + config.windowBegin)
-  const windowEnd = dayjs(now.format('YYYY-MM-DD') + 'T' + config.windowEnd)
+  windowBegin = dayjs(now.format('YYYY-MM-DD') + 'T' + windowBegin)
+  windowEnd = dayjs(now.format('YYYY-MM-DD') + 'T' + windowEnd)
 
   const windowDuration = windowEnd.diff(windowBegin, 'seconds')
 
   const calcRandomDuration = () =>
-    random.int(Number(config.minDuration), Number(config.maxDuration))
+    random.int(Number(minDuration), Number(maxDuration))
 
-  const calcRandomCount = () =>
-    random.int(Number(config.minCount), Number(config.maxCount))
+  const calcRandomCount = () => random.int(Number(minCount), Number(maxCount))
 
   const sumDurations = blocks =>
     blocks.reduce((prev, curr) => prev + curr.duration, 0)
@@ -72,7 +78,7 @@ function createSchedule (node, config) {
   return _calcScheduleTimes(schedule, windowBegin)
 }
 
-function _combineBlocks (offBlocks, onBlocks) {
+function _combineBlocks(offBlocks, onBlocks) {
   let schedule = []
 
   for (let i = 0; i < offBlocks.length; i++) {
@@ -86,7 +92,7 @@ function _combineBlocks (offBlocks, onBlocks) {
   return schedule
 }
 
-function _calcScheduleTimes (schedule, start) {
+function _calcScheduleTimes(schedule, start) {
   schedule.forEach(block => {
     block.beginString = start.format('HH:mm:ss')
     let end = start.add(block.duration, 'second')
@@ -98,7 +104,7 @@ function _calcScheduleTimes (schedule, start) {
   return schedule
 }
 
-function stripPastBlocks (blocks) {
+function stripPastBlocks(blocks) {
   const now = dayjs()
   return blocks.filter(block => {
     let end = block.begin.add(block.duration, 'second')

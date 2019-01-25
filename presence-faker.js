@@ -24,15 +24,16 @@ module.exports = function(RED) {
 
       if (msg.payload === true) {
         // activate!
-        let schedule = stripPastBlocks(createSchedule(node, config))
+        let schedule = stripPastBlocks(createSchedule(config))
 
         if (schedule.length === 0) {
           node.status({
             fill: 'grey',
             shape: 'dot',
-            text: `schedule completed`
+            text: 'schedule completed'
           })
         } else {
+          let cronjob
           const scheduleNextMessage = function() {
             let nextBlock = schedule.shift()
             sendMsg(nextBlock.isOn)
@@ -42,12 +43,12 @@ module.exports = function(RED) {
               .toDate()
             // const when = nextBlock.begin.toDate()
 
-            const job = new CronJob({
+            cronjob = new CronJob({
               cronTime: when, // nextBlock.begin.toDate()
               onTick: scheduleNextMessage
             })
 
-            job.start()
+            cronjob.start()
 
             node.status({
               fill: 'yellow',
