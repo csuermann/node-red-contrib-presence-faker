@@ -14,5 +14,8 @@
     "cron": "^1.6.0",
     "dayjs": "^1.8.0",
     "random": "^2.0.13"
+  },
+  "devDependencies": {
+    "eslint": "^5.12.1"
   }
 }
