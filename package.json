@@ -5,6 +5,10 @@
   "main": "index.js",
   "author": "Cornelius Suermann",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/csuermann/presence-faker"
+  },
   "node-red": {
     "nodes": {
       "presence-faker": "presence-faker.js"
