@@ -1,19 +1,20 @@
 const { createSchedule, stripPastBlocks } = require('./pf')
 const CronJob = require('cron').CronJob
+const dayjs = require('dayjs')
 
-function cancelSchedule (node, config) {
+function cancelSchedule(node, config) {
   node.send({
     topic: config.offTopic,
     payload: config.offPayload
   })
 }
 
-module.exports = function (RED) {
-  function PresenceFakerNode (config) {
+module.exports = function(RED) {
+  function PresenceFakerNode(config) {
     RED.nodes.createNode(this, config)
     const node = this
 
-    node.on('input', function (msg) {
+    node.on('input', function(msg) {
       const sendMsg = isOn => {
         node.send({
           topic: isOn ? config.onTopic : config.offTopic,
@@ -32,17 +33,32 @@ module.exports = function (RED) {
             text: `schedule completed`
           })
         } else {
-          let currentBlock = schedule[0]
+          const scheduleNextMessage = function() {
+            let nextBlock = schedule.shift()
+            sendMsg(nextBlock.isOn)
 
-          sendMsg(currentBlock.isOn)
+            const when = dayjs()
+              .add(2, 'second')
+              .toDate()
+            // const when = nextBlock.begin.toDate()
 
-          node.status({
-            fill: 'yellow',
-            shape: currentBlock.isOn ? 'dot' : 'ring',
-            text: `${currentBlock.isOn ? 'ON' : 'OFF'} [${
-              currentBlock.beginString
-            } - ${currentBlock.endString}]`
-          })
+            const job = new CronJob({
+              cronTime: when, // nextBlock.begin.toDate()
+              onTick: scheduleNextMessage
+            })
+
+            job.start()
+
+            node.status({
+              fill: 'yellow',
+              shape: nextBlock.isOn ? 'dot' : 'ring',
+              text: `${nextBlock.isOn ? 'ON' : 'OFF'} [${
+                nextBlock.beginString
+              } - ${nextBlock.endString}]`
+            })
+          }
+
+          scheduleNextMessage()
         }
 
         // node.warn(schedule)
@@ -61,7 +77,7 @@ module.exports = function (RED) {
       }
     })
 
-    node.on('close', function () {
+    node.on('close', function() {
       // tidy up
     })
   }
