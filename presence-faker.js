@@ -7,98 +7,111 @@ module.exports = function (RED) {
     RED.nodes.createNode(this, config)
 
     const node = this
-    let schedule = []
-    let rescheduleCron
-    let msgCron
-    let isActive = false
+    let windowBeginCron
+    let windowEndCron
+    let msgCrons = []
 
-    ;(function () {
+    const setNodeStatusForBlock = function (block) {
       node.status({
-        fill: 'red',
-        shape: 'ring',
-        text: 'inactive upon load'
+        fill: 'yellow',
+        shape: block.isOn ? 'dot' : 'ring',
+        text: `${block.isOn ? 'ON' : 'OFF'} [${block.beginString} - ${
+          block.endString
+        }]`
       })
-    })()
+    }
 
-    const activateDailyCron = function () {
+    const setNodeStatus = function (text) {
+      node.status({
+        fill: 'grey',
+        shape: 'dot',
+        text: text
+      })
+    }
+
+    const isNowWithinWindow = function () {
+      const now = dayjs()
+      const begin = dayjs(now.format('YYYY-MM-DD') + 'T' + config.windowBegin)
+      const end = dayjs(now.format('YYYY-MM-DD') + 'T' + config.windowEnd)
+
+      return (
+        (now.isAfter(begin) && now.isBefore(end)) ||
+        now.isSame(begin) ||
+        now.isSame(begin)
+      )
+    }
+
+    const scheduleWindowCrons = function () {
       stopCrons()
-      isActive = true
-      let now = dayjs()
-      let begin = dayjs(now.format('YYYY-MM-DD') + 'T' + config.windowBegin)
 
-      // const fakeCronTime = dayjs()
-      //   .add(5, 'second')
-      //   .toDate()
+      const now = dayjs()
+      const begin = dayjs(now.format('YYYY-MM-DD') + 'T' + config.windowBegin)
+      const end = dayjs(now.format('YYYY-MM-DD') + 'T' + config.windowEnd)
+      const windowBeginCronCallback = function () {
+        const schedule = stripPastBlocks(createSchedule(config))
+        const currentBlock = schedule.shift()
+        sendMsg(currentBlock.isOn)
+        setNodeStatusForBlock(currentBlock)
+        scheduleMsgCrons(schedule)
+      }
 
-      rescheduleCron = new CronJob({
+      if (isNowWithinWindow()) {
+        windowBeginCronCallback()
+      } else {
+        setNodeStatus(`next cycle: ${begin.format('HH:mm')}`)
+      }
+
+      windowBeginCron = new CronJob({
         cronTime: `0 ${begin.minute()} ${begin.hour()} * * *`, // sec min hour dom month dow
+        onTick: windowBeginCronCallback
+      })
+      windowBeginCron.start()
+
+      windowEndCron = new CronJob({
+        cronTime: `0 ${end.minute()} ${end.hour()} * * *`, // sec min hour dom month dow
         // cronTime: fakeCronTime,
         onTick: () => {
-          schedule = createSchedule(config)
-          scheduleNextMessage()
+          setNodeStatus('cycle completed')
         }
       })
+      windowEndCron.start()
 
-      rescheduleCron.start()
+      node.warn(
+        `window crontabs set up for ${begin.format('HH:mm')} and ${end.format(
+          'HH:mm'
+        )}`
+      )
+    }
 
-      node.warn(`crontab set up for ${begin.format('HH:mm')}`)
+    const scheduleMsgCrons = function (schedule) {
+      msgCrons = schedule.map(block => {
+        const cron = new CronJob({
+          cronTime: block.begin.toDate(),
+          onTick: () => {
+            sendMsg(block.isOn)
+            setNodeStatusForBlock(block)
+          }
+        })
+
+        cron.start()
+        return cron
+      })
     }
 
     const stopCrons = function () {
-      isActive = false
-      if (rescheduleCron) {
-        rescheduleCron.stop()
-        node.warn(`daily crontab deleted`)
+      if (windowBeginCron) {
+        windowBeginCron.stop()
+        windowEndCron.stop()
+        node.warn(`window crons deleted`)
       }
 
-      if (msgCron) {
-        msgCron.stop()
-        node.warn(`schedule crontab deleted`)
-      }
-    }
-
-    const scheduleNextMessage = function () {
-      let nextBlock = schedule.shift()
-
-      if (nextBlock) {
-        sendMsg(nextBlock.isOn)
-
-        // let cronTime = dayjs()
-        //   .add(2, 'second')
-        //   .toDate()
-        let cronTime = nextBlock.begin.toDate()
-
-        // avoid scheduling a cronjob for the past
-        if (nextBlock.begin.isBefore(dayjs())) {
-          if (schedule[0]) {
-            cronTime = schedule[0].begin.toDate()
-          } else {
-            cronTime = null
-          }
-        }
-
-        if (cronTime) {
-          msgCron = new CronJob({
-            cronTime: cronTime,
-            onTick: scheduleNextMessage
-          })
-
-          msgCron.start()
-        }
-
-        node.status({
-          fill: 'yellow',
-          shape: nextBlock.isOn ? 'dot' : 'ring',
-          text: `${nextBlock.isOn ? 'ON' : 'OFF'} [${nextBlock.beginString} - ${
-            nextBlock.endString
-          }]`
+      if (msgCrons.length > 0) {
+        msgCrons.forEach(cron => {
+          cron.stop()
         })
-      } else {
-        node.status({
-          fill: 'grey',
-          shape: 'dot',
-          text: 'suspended'
-        })
+
+        node.warn(`${msgCrons.length} message crons deleted`)
+        msgCrons = []
       }
     }
 
@@ -112,24 +125,20 @@ module.exports = function (RED) {
     node.on('input', function (msg) {
       if (msg.payload === true) {
         // activate!
-        activateDailyCron()
-        schedule = stripPastBlocks(createSchedule(config))
-        scheduleNextMessage()
+        scheduleWindowCrons()
       } else if (msg.payload === false) {
         // deactivate!
         stopCrons()
-
-        node.status({
-          fill: 'red',
-          shape: 'ring',
-          text: 'inactive'
-        })
+        setNodeStatus('inactive')
       }
     })
 
     node.on('close', function () {
       stopCrons()
     })
+    ;(function () {
+      setNodeStatus('inactive upon load')
+    })()
   }
 
   RED.nodes.registerType('presence-faker', PresenceFakerNode)
