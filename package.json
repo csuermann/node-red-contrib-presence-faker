@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-presence-faker",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Fakes presence in your smart home by switching devices (e.g. lights) on and off at random times.",
   "main": "index.js",
   "author": "Cornelius Suermann",
