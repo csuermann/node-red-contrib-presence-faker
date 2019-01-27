@@ -81,11 +81,30 @@
 
 <script type="text/x-red" data-help-name="presence-faker">
   <p>Node that fakes presence in a smart home by switching devices (e.g. lights) on and off at random times.</p>
-  <h3>Outputs</h3>
-      <dl class="message-properties">
+  <h3>Inputs</h3>
+    <dl class="message-properties">
       <dt>payload
-          <span class="property-type">string | buffer</span>
+          <span class="property-type">bool</span>
       </dt>
+    </dl>
+  <h3>Outputs</h3>
+    <dl class="message-properties">
+      <dt>payload
+          <span class="property-type">string</span>
+      </dt>
+    </dl>
   <h3>Details</h3>
-  <p>Some more information about the node.</p>
+  <p>
+    The node does nothing unless it receives <code>true</code> as an incoming <code>msg.payload</code>, which will
+    activate the node and generate a random schedule of ON / OFF events. Those will be ejected over time as outgoing
+    messages with <code>payload</code> and <code>topic</code> as specified in the node properties.
+  </p>
+  <p>
+    Send a message with <code>msg.payload</code> of <code>false</code> to disable the node again. The node will then not
+    output any more messages, hence leaving the controlling device in the state it happens to be in.
+  </p>
+  <p>
+      Enabling / disabling the node would typically be triggered by your home automation system, e.g. based on
+      occupation status of your home.
+  </p>
 </script>

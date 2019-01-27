@@ -37,7 +37,7 @@ module.exports = function (RED) {
       return (
         (now.isAfter(begin) && now.isBefore(end)) ||
         now.isSame(begin) ||
-        now.isSame(begin)
+        now.isSame(end)
       )
     }
 
@@ -50,8 +50,7 @@ module.exports = function (RED) {
       const windowBeginCronCallback = function () {
         const schedule = stripPastBlocks(createSchedule(config))
         const currentBlock = schedule.shift()
-        sendMsg(currentBlock.isOn)
-        setNodeStatusForBlock(currentBlock)
+        executeBlock(currentBlock)
         scheduleMsgCrons(schedule)
       }
 
@@ -88,8 +87,7 @@ module.exports = function (RED) {
         const cron = new CronJob({
           cronTime: block.begin.toDate(),
           onTick: () => {
-            sendMsg(block.isOn)
-            setNodeStatusForBlock(block)
+            executeBlock(block)
           }
         })
 
@@ -115,18 +113,27 @@ module.exports = function (RED) {
       }
     }
 
-    const sendMsg = isOn => {
+    const executeBlock = block => {
       node.send({
-        topic: isOn ? config.onTopic : config.offTopic,
-        payload: isOn ? config.onPayload : config.offPayload
+        topic: block.isOn ? config.onTopic : config.offTopic,
+        payload: block.isOn ? config.onPayload : config.offPayload
       })
+      setNodeStatusForBlock(block)
     }
 
     node.on('input', function (msg) {
-      if (msg.payload === true) {
+      if (
+        msg.payload === true ||
+        msg.payload === 'true' ||
+        msg.payload === 'activate'
+      ) {
         // activate!
         scheduleWindowCrons()
-      } else if (msg.payload === false) {
+      } else if (
+        msg.payload === false ||
+        msg.payload === 'false' ||
+        msg.payload === 'deactivate'
+      ) {
         // deactivate!
         stopCrons()
         setNodeStatus('inactive')
