@@ -100,8 +100,8 @@
     messages with <code>payload</code> and <code>topic</code> as specified in the node properties.
   </p>
   <p>
-    Send a message with <code>msg.payload</code> of <code>false</code> to disable the node again. The node will then not
-    output any more messages, hence leaving the controlling device in the state it happens to be in.
+    Once the node receives a message with <code>msg.payload</code> of <code>false</code> it will get disabled. It will
+    then not output any more messages, hence leaving the controlling device in its current state.
   </p>
   <p>
       Enabling / disabling the node would typically be triggered by your home automation system, e.g. based on
