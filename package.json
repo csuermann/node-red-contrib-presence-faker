@@ -5,6 +5,13 @@
   "main": "index.js",
   "author": "Cornelius Suermann",
   "license": "MIT",
+  "keywords": [
+    "node-red",
+    "smart home",
+    "vacation",
+    "presence",
+    "lights"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/csuermann/presence-faker"
