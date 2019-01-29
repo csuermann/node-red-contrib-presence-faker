@@ -2,8 +2,8 @@ const { createSchedule, stripPastBlocks } = require('./pf')
 const CronJob = require('cron').CronJob
 const dayjs = require('dayjs')
 
-module.exports = function(RED) {
-  function PresenceFakerNode(config) {
+module.exports = function (RED) {
+  function PresenceFakerNode (config) {
     RED.nodes.createNode(this, config)
 
     const node = this
@@ -11,7 +11,7 @@ module.exports = function(RED) {
     let windowEndCron
     let msgCrons = []
 
-    const setNodeStatusForBlock = function(block) {
+    const setNodeStatusForBlock = function (block) {
       node.status({
         fill: 'yellow',
         shape: block.isOn ? 'dot' : 'ring',
@@ -21,7 +21,7 @@ module.exports = function(RED) {
       })
     }
 
-    const setNodeStatus = function(text) {
+    const setNodeStatus = function (text) {
       node.status({
         fill: 'grey',
         shape: 'dot',
@@ -29,7 +29,7 @@ module.exports = function(RED) {
       })
     }
 
-    const isNowWithinWindow = function() {
+    const isNowWithinWindow = function () {
       const now = dayjs()
       const begin = dayjs(now.format('YYYY-MM-DD') + 'T' + config.windowBegin)
       const end = dayjs(now.format('YYYY-MM-DD') + 'T' + config.windowEnd)
@@ -41,13 +41,13 @@ module.exports = function(RED) {
       )
     }
 
-    const scheduleWindowCrons = function() {
+    const scheduleWindowCrons = function () {
       stopCrons()
 
       const now = dayjs()
       const begin = dayjs(now.format('YYYY-MM-DD') + 'T' + config.windowBegin)
       const end = dayjs(now.format('YYYY-MM-DD') + 'T' + config.windowEnd)
-      const windowBeginCronCallback = function() {
+      const windowBeginCronCallback = function () {
         const schedule = stripPastBlocks(createSchedule(config))
         const currentBlock = schedule.shift()
         executeBlock(currentBlock)
@@ -82,7 +82,7 @@ module.exports = function(RED) {
       )
     }
 
-    const scheduleMsgCrons = function(schedule) {
+    const scheduleMsgCrons = function (schedule) {
       msgCrons = schedule.map(block => {
         const cron = new CronJob({
           cronTime: block.begin.toDate(),
@@ -96,7 +96,7 @@ module.exports = function(RED) {
       })
     }
 
-    const stopCrons = function() {
+    const stopCrons = function () {
       if (windowBeginCron) {
         windowBeginCron.stop()
         windowEndCron.stop()
@@ -114,14 +114,32 @@ module.exports = function(RED) {
     }
 
     const executeBlock = block => {
+      const castPayload = (payload, payloadType) => {
+        if (payloadType === 'num') {
+          return Number(payload)
+        } else if (payloadType === 'bool') {
+          return Boolean(payload)
+        } else if (payloadType === 'json') {
+          return JSON.parse(payload)
+        } else {
+          return payload
+        }
+      }
+
+      let payload = block.isOn ? config.onPayload : config.offPayload
+      let payloadType = block.isOn
+        ? config.onPayloadType
+        : config.offPayloadType
+
       node.send({
         topic: block.isOn ? config.onTopic : config.offTopic,
-        payload: block.isOn ? config.onPayload : config.offPayload
+        payload: castPayload(payload, payloadType)
       })
+
       setNodeStatusForBlock(block)
     }
 
-    node.on('input', function(msg) {
+    node.on('input', function (msg) {
       node.warn(config)
       if (
         msg.payload === true ||
@@ -141,10 +159,10 @@ module.exports = function(RED) {
       }
     })
 
-    node.on('close', function() {
+    node.on('close', function () {
       stopCrons()
     })
-    ;(function() {
+    ;(function () {
       setNodeStatus('inactive upon load')
     })()
   }
