@@ -1,7 +1,7 @@
 const random = require('random')
 const dayjs = require('dayjs')
 
-function createSchedule({
+function createSchedule ({
   windowBegin,
   windowEnd,
   minDuration,
@@ -24,25 +24,32 @@ function createSchedule({
   const sumDurations = blocks =>
     blocks.reduce((prev, curr) => prev + curr.duration, 0)
 
+  const calcRandomDeviation = avgDeviation => {
+    return random.int(-1 * avgDeviation, avgDeviation)
+  }
+
   const count = calcRandomCount()
 
   const onBlocks = []
   const offBlocks = []
 
   for (let i = 1; i <= count; i++) {
-    let OnBlock = {
+    onBlocks.push({
       isOn: true,
       duration: calcRandomDuration()
-    }
-
-    onBlocks.push(OnBlock)
+    })
   }
 
-  let sumOnDurations = onBlocks.reduce((prev, curr) => prev + curr.duration, 0)
-
-  const calcRandomDeviation = avgDeviation => {
-    return random.int(-1 * avgDeviation, avgDeviation)
+  // remove as many blocks as needed to fit the time window
+  while (sumDurations(onBlocks) >= windowDuration) {
+    onBlocks.shift()
   }
+
+  // add one block if none was left:
+  if (onBlocks.length == 0) {
+  }
+
+  let sumOnDurations = sumDurations(onBlocks)
 
   // how much time is left for OFF blocks?
   let sumOffDurations = windowDuration - sumOnDurations
@@ -54,15 +61,14 @@ function createSchedule({
   // add OFF blocks (except final one)
   for (let i = count + 1; i > 1; i--) {
     let currentDeviation = calcRandomDeviation(deviation)
-    let offBlock = {
+
+    offBlocks.push({
       isOn: false,
       duration: Math.round(
         avgOffDuration + currentDeviation + lastDeviation * -1,
         0
       )
-    }
-
-    offBlocks.push(offBlock)
+    })
 
     lastDeviation = currentDeviation
   }
@@ -78,7 +84,7 @@ function createSchedule({
   return _calcScheduleTimes(schedule, windowBegin)
 }
 
-function _combineBlocks(offBlocks, onBlocks) {
+function _combineBlocks (offBlocks, onBlocks) {
   let schedule = []
 
   for (let i = 0; i < offBlocks.length; i++) {
@@ -92,7 +98,7 @@ function _combineBlocks(offBlocks, onBlocks) {
   return schedule
 }
 
-function _calcScheduleTimes(schedule, start) {
+function _calcScheduleTimes (schedule, start) {
   schedule.forEach(block => {
     block.beginString = start.format('HH:mm:ss')
     let end = start.add(block.duration, 'second')
@@ -104,7 +110,7 @@ function _calcScheduleTimes(schedule, start) {
   return schedule
 }
 
-function stripPastBlocks(blocks) {
+function stripPastBlocks (blocks) {
   const now = dayjs()
   return blocks.filter(block => {
     let end = block.begin.add(block.duration, 'second')
