@@ -91,7 +91,12 @@ module.exports = function (RED) {
           }
         })
 
-        cron.start()
+        try {
+          cron.start()
+        } catch (e) {
+          node.warn(e)
+        }
+
         return cron
       })
     }
