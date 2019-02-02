@@ -28,12 +28,12 @@ function createSchedule ({
     return random.int(-1 * avgDeviation, avgDeviation)
   }
 
-  const count = calcRandomCount()
+  const randomCount = calcRandomCount()
 
   const onBlocks = []
   const offBlocks = []
 
-  for (let i = 1; i <= count; i++) {
+  for (let i = 1; i <= randomCount; i++) {
     onBlocks.push({
       isOn: true,
       duration: calcRandomDuration()
@@ -47,6 +47,10 @@ function createSchedule ({
 
   // add one block if none was left:
   if (onBlocks.length == 0) {
+    onBlocks.push({
+      isOn: true,
+      duration: Math.floor(windowDuration * 0.9) // spans 90% of the window
+    })
   }
 
   let sumOnDurations = sumDurations(onBlocks)
@@ -54,12 +58,12 @@ function createSchedule ({
   // how much time is left for OFF blocks?
   let sumOffDurations = windowDuration - sumOnDurations
 
-  let avgOffDuration = Math.floor(sumOffDurations / (count + 1))
+  let avgOffDuration = Math.floor(sumOffDurations / (onBlocks.length + 1))
   let deviation = Math.floor(avgOffDuration * 0.4)
   let lastDeviation = 0
 
   // add OFF blocks (except final one)
-  for (let i = count + 1; i > 1; i--) {
+  for (let i = onBlocks.length + 1; i > 1; i--) {
     let currentDeviation = calcRandomDeviation(deviation)
 
     offBlocks.push({

@@ -11,6 +11,12 @@ module.exports = function (RED) {
     let windowEndCron
     let msgCrons = []
 
+    const debug = function (debugMsg) {
+      if (RED.settings.presenceFakerDebug) {
+        node.warn(debugMsg)
+      }
+    }
+
     const setNodeStatusForBlock = function (block) {
       node.status({
         fill: 'yellow',
@@ -49,6 +55,7 @@ module.exports = function (RED) {
       const end = dayjs(now.format('YYYY-MM-DD') + 'T' + config.windowEnd)
       const windowBeginCronCallback = function () {
         const schedule = stripPastBlocks(createSchedule(config))
+        debug(schedule)
         const currentBlock = schedule.shift()
         executeBlock(currentBlock)
         scheduleMsgCrons(schedule)
@@ -75,7 +82,7 @@ module.exports = function (RED) {
       })
       windowEndCron.start()
 
-      node.warn(
+      debug(
         `window crontabs set up for ${begin.format('HH:mm')} and ${end.format(
           'HH:mm'
         )}`
@@ -94,7 +101,7 @@ module.exports = function (RED) {
         try {
           cron.start()
         } catch (e) {
-          node.warn(e)
+          debug(e)
         }
 
         return cron
@@ -105,7 +112,7 @@ module.exports = function (RED) {
       if (windowBeginCron) {
         windowBeginCron.stop()
         windowEndCron.stop()
-        node.warn(`window crons deleted`)
+        debug(`window crons deleted`)
       }
 
       if (msgCrons.length > 0) {
@@ -113,7 +120,7 @@ module.exports = function (RED) {
           cron.stop()
         })
 
-        node.warn(`${msgCrons.length} message crons deleted`)
+        debug(`${msgCrons.length} message crons deleted`)
         msgCrons = []
       }
     }
@@ -123,7 +130,7 @@ module.exports = function (RED) {
         if (payloadType === 'num') {
           return Number(payload)
         } else if (payloadType === 'bool') {
-          return Boolean(payload)
+          return payload === 'true'
         } else if (payloadType === 'json') {
           return JSON.parse(payload)
         } else {
@@ -145,7 +152,6 @@ module.exports = function (RED) {
     }
 
     node.on('input', function (msg) {
-      node.warn(config)
       if (
         msg.payload === true ||
         msg.payload === 'true' ||
