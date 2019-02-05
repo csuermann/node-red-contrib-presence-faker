@@ -79,7 +79,8 @@
 
           return true
         }
-      }
+      },
+      actionOnDisable: { value: 'none' }
     },
     inputs: 1,
     outputs: 1,
@@ -350,6 +351,15 @@
   <div class="form-row">
     <label for="node-input-offTopic"><i class="fa fa-tasks"></i> <span>OFF Topic</span></label>
     <input type="text" id="node-input-offTopic">
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-actionOnDisable"><i class="fa fa-power-off"></i> <span>when disabled</span></label>
+    <select id="node-input-actionOnDisable">
+      <option value="none">do nothing</option>
+      <option value="on">send ON message</option>
+      <option value="off">send OFF message</option>
+    </select>
   </div>
 </script>
 

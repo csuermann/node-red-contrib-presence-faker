@@ -8,6 +8,10 @@ You can configure a time window during which the node should eject random ON / O
 
 ![example](docs/example.png)
 
-## Contributions
+## Properties Configuration
 
-... are always welcome!
+![example](docs/node-props.png)
+
+## Contributions and Suggestions
+
+... are always welcome! Just file a GitHub [issue](https://github.com/csuermann/presence-faker/issues) or [pull request](https://github.com/csuermann/presence-faker/pulls)!

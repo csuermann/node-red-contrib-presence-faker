@@ -126,6 +126,11 @@ module.exports = function (RED) {
     }
 
     const executeBlock = block => {
+      ejectMsg(block.isOn)
+      setNodeStatusForBlock(block)
+    }
+
+    const ejectMsg = function (isOn) {
       const castPayload = (payload, payloadType) => {
         if (payloadType === 'num') {
           return Number(payload)
@@ -138,23 +143,20 @@ module.exports = function (RED) {
         }
       }
 
-      let payload = block.isOn ? config.onPayload : config.offPayload
-      let payloadType = block.isOn
-        ? config.onPayloadType
-        : config.offPayloadType
+      let payload = isOn ? config.onPayload : config.offPayload
+      let payloadType = isOn ? config.onPayloadType : config.offPayloadType
 
       node.send({
-        topic: block.isOn ? config.onTopic : config.offTopic,
+        topic: isOn ? config.onTopic : config.offTopic,
         payload: castPayload(payload, payloadType)
       })
-
-      setNodeStatusForBlock(block)
     }
 
     node.on('input', function (msg) {
       if (
         msg.payload === true ||
         msg.payload === 'true' ||
+        msg.payload === 'enable' ||
         msg.payload === 'activate'
       ) {
         // activate!
@@ -162,10 +164,14 @@ module.exports = function (RED) {
       } else if (
         msg.payload === false ||
         msg.payload === 'false' ||
+        msg.payload === 'disable' ||
         msg.payload === 'deactivate'
       ) {
         // deactivate!
         stopCrons()
+        if (isNowWithinWindow() && config.actionOnDisable !== 'none') {
+          ejectMsg(config.actionOnDisable === 'on')
+        }
         setNodeStatus('inactive')
       }
     })
