@@ -180,7 +180,12 @@ module.exports = function (RED) {
       stopCrons()
     })
     ;(function () {
-      setNodeStatus('inactive upon load')
+      // on startup:
+      if (config.startupBehavior === 'onStartup') {
+        node.emit('input', { payload: true })
+      } else {
+        setNodeStatus('inactive upon load')
+      }
     })()
   }
 

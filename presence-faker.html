@@ -80,6 +80,7 @@
           return true
         }
       },
+      startupBehavior: { value: 'onMsg' },
       actionOnDisable: { value: 'none' }
     },
     inputs: 1,
@@ -354,8 +355,16 @@
   </div>
 
   <div class="form-row">
+    <label for="node-input-startupBehavior"><i class="fa fa-power-off"></i> <span>enable</span></label>
+    <select id="node-input-startupBehavior" style="width:70%">
+      <option value="onMsg">when TRUE is received as msg.payload</option>
+      <option value="onStartup">when the flow starts up</option>
+    </select>
+  </div>
+
+  <div class="form-row">
     <label for="node-input-actionOnDisable"><i class="fa fa-power-off"></i> <span>when disabled</span></label>
-    <select id="node-input-actionOnDisable">
+    <select id="node-input-actionOnDisable" style="width:70%">
       <option value="none">do nothing</option>
       <option value="on">send ON message</option>
       <option value="off">send OFF message</option>
@@ -382,13 +391,15 @@
     </dl>
   <h3>Details</h3>
   <p>
-    The node does nothing unless it receives <code>true</code> as an incoming <code>msg.payload</code>, which will
-    activate the node and generate a random schedule of ON / OFF events. Those will be ejected over time as outgoing
+    By default the node does nothing unless it receives <code>true</code> as an incoming <code>msg.payload</code>,
+    which will activate the node and generate a random schedule of ON / OFF events. Those will be ejected over time as outgoing
     messages with <code>payload</code> and <code>topic</code> as specified in the node properties.
   </p>
   <p>
-    Once the node receives a message with <code>msg.payload</code> of <code>false</code> it will get disabled. It will
-    then not output any more messages, hence leaving the controlling device in its current state.
+    You can also configure the node to start up enabled in order not to require an incoming activation message.
+  <p>
+    Once the node receives a message with <code>msg.payload</code> of <code>false</code> it will get disabled. You can configure
+    whether or not and what kind of message the node should eject in this case.
   </p>
   <p>
       Enabling / disabling the node would typically be triggered by your home automation system, e.g. based on
