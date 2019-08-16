@@ -1,13 +1,13 @@
 const random = require('random')
 const dayjs = require('dayjs')
 
-function createSchedule ({
+function createSchedule({
   windowBegin,
   windowEnd,
   minDuration,
   maxDuration,
   minCount,
-  maxCount
+  maxCount,
 }) {
   const now = dayjs()
 
@@ -19,14 +19,13 @@ function createSchedule ({
   const calcRandomDuration = () =>
     random.int(Number(minDuration), Number(maxDuration))
 
-  const calcRandomCount = () => random.int(Number(minCount), Number(maxCount))
+  const calcRandomCount = () =>
+    calcRandomNumber(Number(minCount), Number(maxCount))
+
+  const calcRandomNumber = (min, max) => random.int(min, max)
 
   const sumDurations = blocks =>
     blocks.reduce((prev, curr) => prev + curr.duration, 0)
-
-  const calcRandomDeviation = avgDeviation => {
-    return random.int(-1 * avgDeviation, avgDeviation)
-  }
 
   const randomCount = calcRandomCount()
 
@@ -36,7 +35,7 @@ function createSchedule ({
   for (let i = 1; i <= randomCount; i++) {
     onBlocks.push({
       isOn: true,
-      duration: calcRandomDuration()
+      duration: calcRandomDuration(),
     })
   }
 
@@ -49,7 +48,7 @@ function createSchedule ({
   if (onBlocks.length == 0) {
     onBlocks.push({
       isOn: true,
-      duration: Math.floor(windowDuration * 0.9) // spans 90% of the window
+      duration: Math.floor(windowDuration * 0.9), // spans 90% of the window
     })
   }
 
@@ -58,37 +57,34 @@ function createSchedule ({
   // how much time is left for OFF blocks?
   let sumOffDurations = windowDuration - sumOnDurations
 
-  let avgOffDuration = Math.floor(sumOffDurations / (onBlocks.length + 1))
-  let deviation = Math.floor(avgOffDuration * 0.4)
-  let lastDeviation = 0
+  const offBlockCount = onBlocks.length + 1
 
-  // add OFF blocks (except final one)
-  for (let i = onBlocks.length + 1; i > 1; i--) {
-    let currentDeviation = calcRandomDeviation(deviation)
-
+  for (let i = 0; i < offBlockCount; i++) {
     offBlocks.push({
       isOn: false,
-      duration: Math.round(
-        avgOffDuration + currentDeviation + lastDeviation * -1,
-        0
-      )
+      random: calcRandomNumber(1, 10),
     })
-
-    lastDeviation = currentDeviation
   }
 
-  // add final OFF block with remaining time to fit the whole window
-  offBlocks.push({
-    isOn: false,
-    isLastBlock: true,
-    duration: sumOffDurations - sumDurations(offBlocks)
+  const sumOfRandom = offBlocks.reduce((acc, curr) => acc + curr.random, 0)
+
+  offBlocks.map(block => {
+    const factor = block.random / sumOfRandom
+    block.duration = Math.floor(sumOffDurations * factor)
+    delete block.random
   })
+
+  //do off-durations match sumOffDurations?
+  const diff = sumOffDurations - sumDurations(offBlocks)
+
+  //apply diff to 1st off-block
+  offBlocks[0].duration += diff
 
   let schedule = _combineBlocks(offBlocks, onBlocks)
   return _calcScheduleTimes(schedule, windowBegin)
 }
 
-function _combineBlocks (offBlocks, onBlocks) {
+function _combineBlocks(offBlocks, onBlocks) {
   let schedule = []
 
   for (let i = 0; i < offBlocks.length; i++) {
@@ -102,7 +98,7 @@ function _combineBlocks (offBlocks, onBlocks) {
   return schedule
 }
 
-function _calcScheduleTimes (schedule, start) {
+function _calcScheduleTimes(schedule, start) {
   schedule.forEach(block => {
     block.beginString = start.format('HH:mm:ss')
     let end = start.add(block.duration, 'second')
@@ -114,7 +110,7 @@ function _calcScheduleTimes (schedule, start) {
   return schedule
 }
 
-function stripPastBlocks (blocks) {
+function stripPastBlocks(blocks) {
   const now = dayjs()
   return blocks.filter(block => {
     let end = block.begin.add(block.duration, 'second')

@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-presence-faker",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "This Node-RED node can pretend that your home is occupied by switching devices (e.g. lights) on and off at random (configurable) times.",
   "main": "index.js",
   "author": "Cornelius Suermann",
@@ -23,11 +23,17 @@
     }
   },
   "dependencies": {
-    "cron": "^1.6.0",
-    "dayjs": "^1.8.0",
-    "random": "^2.0.13"
+    "cron": "^1.7.1",
+    "dayjs": "^1.8.15",
+    "random": "^2.1.1"
   },
   "devDependencies": {
-    "eslint": "^5.12.1"
+    "eslint": "^6.1.0"
+  },
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "semi": false,
+    "singleQuote": true
   }
 }
