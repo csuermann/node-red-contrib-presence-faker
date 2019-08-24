@@ -14,13 +14,13 @@
       name: { value: '' },
       onPayload: {
         value: '',
-        validate: RED.validators.typedInput('payloadType')
+        validate: RED.validators.typedInput('payloadType'),
       },
       onPayloadType: { value: 'string' },
       onTopic: { value: '', required: false },
       offPayload: {
         value: '',
-        validate: RED.validators.typedInput('payloadType')
+        validate: RED.validators.typedInput('payloadType'),
       },
       offPayloadType: { value: 'string' },
       offTopic: { value: '', required: false },
@@ -29,14 +29,14 @@
         required: true,
         validate: RED.validators.regex(
           /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/
-        )
+        ),
       },
       windowEnd: {
         value: '17:30',
         required: true,
         validate: RED.validators.regex(
           /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/
-        )
+        ),
       },
       minDurationHours: { value: 0, required: true },
       minDurationMinutes: { value: 0, required: true },
@@ -55,7 +55,7 @@
           } else {
             return true
           }
-        }
+        },
       },
       maxCount: {
         value: 1,
@@ -65,23 +65,15 @@
             return false
           }
 
-          // const calcDuration = type => {
-          //   // type can be 'min' or 'max'
-          //   let hours = Number($(`#node-input-${type}DurationHours`).val())
-          //   let minutes = Number($(`#node-input-${type}DurationMinutes`).val())
-          //   let seconds = Number($(`#node-input-${type}DurationSeconds`).val())
-          //   return hours * 3600 + minutes * 60 + seconds
-          // }
-
           if (calcDuration('min') > calcDuration('max')) {
             return false
           }
 
           return true
-        }
+        },
       },
       startupBehavior: { value: 'onMsg' },
-      actionOnDisable: { value: 'none' }
+      actionOnDisable: { value: 'none' },
     },
     inputs: 1,
     outputs: 1,
@@ -113,11 +105,11 @@
           'str',
           'num',
           'bool',
-          'json'
+          'json',
           //'bin',
           //'date',
           //'env'
-        ]
+        ],
       })
       $('#node-input-onPayload').typedInput('type', this.onPayloadType)
 
@@ -144,18 +136,18 @@
           'str',
           'num',
           'bool',
-          'json'
+          'json',
           //'bin',
           //'date',
           //'env'
-        ]
+        ],
       })
       $('#node-input-offPayload').typedInput('type', this.offPayloadType)
     },
     oneditsave: function() {
       $('#node-input-minDuration').val(calcDuration('min'))
       $('#node-input-maxDuration').val(calcDuration('max'))
-    }
+    },
   })
 </script>
 <style>
@@ -373,36 +365,51 @@
 </script>
 
 <script type="text/x-red" data-help-name="presence-faker">
-  <p>This node can pretend that your home is occupied by switching devices (e.g. lights) on and off at random times.</p>
-  <h3>Inputs</h3>
-    <dl class="message-properties">
-      <dt>payload
-          <span class="property-type">bool</span>
-      </dt>
-    </dl>
-  <h3>Outputs</h3>
-    <dl class="message-properties">
-      <dt>payload
-          <span class="property-type">string | bool | number | obj</span>
-      </dt>
-      <dt>topic
-        <span class="property-type">string</span>
-    </dt>
-    </dl>
-  <h3>Details</h3>
-  <p>
-    By default the node does nothing unless it receives <code>true</code> as an incoming <code>msg.payload</code>,
-    which will activate the node and generate a random schedule of ON / OFF events. Those will be ejected over time as outgoing
-    messages with <code>payload</code> and <code>topic</code> as specified in the node properties.
-  </p>
-  <p>
-    You can also configure the node to start up enabled in order not to require an incoming activation message.
-  <p>
-    Once the node receives a message with <code>msg.payload</code> of <code>false</code> it will get disabled. You can configure
-    whether or not and what kind of message the node should eject in this case.
-  </p>
-  <p>
-      Enabling / disabling the node would typically be triggered by your home automation system, e.g. based on
-      occupation status of your home.
-  </p>
+      <p>This node can pretend that your home is occupied by switching devices (e.g. lights) on and off at random times.</p>
+      <h3>Inputs</h3>
+        <dl class="message-properties">
+          <dt>payload
+              <span class="property-type">bool</span>
+          </dt>
+        </dl>
+      <h3>Outputs</h3>
+        <dl class="message-properties">
+          <dt>payload
+              <span class="property-type">string | bool | number | obj</span>
+          </dt>
+          <dt>topic
+            <span class="property-type">string</span>
+        </dt>
+        </dl>
+      <h3>Details</h3>
+      <p>
+        By default the node does nothing unless it receives <code>true</code> as an incoming <code>msg.payload</code>,
+        which will activate the node and generate a random schedule of ON / OFF events. Those will be ejected over time as outgoing
+        messages with <code>payload</code> and <code>topic</code> as specified in the node properties.
+      </p>
+      <p>
+        You can also configure the node to start up enabled in order not to require an incoming activation message.
+      <p>
+        Once the node receives a message with <code>msg.payload</code> of <code>false</code> it will get disabled. You can configure
+        whether or not and what kind of message the node should eject in this case.
+      </p>
+      <p>
+        The configuration can also be overwritten at runtime by passing a config object as msg.payload to the presence-faker node.
+        All attributes are optional.
+
+        <pre>
+  {
+      "windowBegin": "00:00",  //string
+      "windowEnd": "23:59:59", //string
+      "minDuration": 60,       //seconds as int
+      "maxDuration": 600,      //seconds as int
+      "minCount": 10,          //int
+      "maxCount": 30           //int
+  }
+        </pre>
+      </p>
+      <p>
+          Enabling / disabling the node would typically be triggered by your home automation system, e.g. based on
+          occupation status of your home, LUX sensors etc.
+      </p>
 </script>

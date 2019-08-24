@@ -10,7 +10,28 @@ You can configure a time window during which the node should eject random ON / O
 
 ## Properties Configuration
 
+Properties can be configured statically using the editor or dynamically by injecting a message with a config object.
+
+### Static Configuration
+
 ![example](docs/node-props.png)
+
+### Dynamic Configuration
+
+You can overwrite the static configuration at runtime by passing a config object as msg.payload to the presence-faker node. All attributes are optional.
+
+```
+{
+    "windowBegin": "00:00",  //string
+    "windowEnd": "23:59:59", //string
+    "minDuration": 60,       //seconds as int
+    "maxDuration": 600,      //seconds as int
+    "minCount": 10,          //int
+    "maxCount": 30           //int
+}
+```
+
+If the presence-faker node is currently enabled, this will instantly create a new schedule with the new configuration being applied. Otherwise the changes will take effect as soon as the presence-faker node gets enabled.
 
 ## Contributions and Suggestions
 
