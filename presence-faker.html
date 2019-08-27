@@ -49,7 +49,7 @@
       minCount: {
         value: 1,
         required: true,
-        validate: function(v) {
+        validate: function (v) {
           if (!/\d+/.exec(v)) {
             return false
           } else {
@@ -60,7 +60,7 @@
       maxCount: {
         value: 1,
         required: true,
-        validate: function(v) {
+        validate: function (v) {
           if (!/\d+/.exec(v)) {
             return false
           }
@@ -78,10 +78,10 @@
     inputs: 1,
     outputs: 1,
     icon: 'light.png',
-    label: function() {
+    label: function () {
       return this.name || 'presence-faker'
     },
-    oneditprepare: function() {
+    oneditprepare: function () {
       //ON Payload
       if (this.onPayloadType == null) {
         if (this.onPayload == '') {
@@ -144,7 +144,7 @@
       })
       $('#node-input-offPayload').typedInput('type', this.offPayloadType)
     },
-    oneditsave: function() {
+    oneditsave: function () {
       $('#node-input-minDuration').val(calcDuration('min'))
       $('#node-input-maxDuration').val(calcDuration('max'))
     },
@@ -410,6 +410,6 @@
       </p>
       <p>
           Enabling / disabling the node would typically be triggered by your home automation system, e.g. based on
-          occupation status of your home, LUX sensors etc.
+          occupation status of your home, LUX sensors, sunset etc.
       </p>
 </script>
