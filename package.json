@@ -17,6 +17,9 @@
     "type": "git",
     "url": "https://github.com/csuermann/presence-faker"
   },
+  "scripts": {
+    "test": "mocha \"test/**/*_spec.js\""
+  },
   "node-red": {
     "nodes": {
       "presence-faker": "presence-faker.js"
@@ -28,7 +31,10 @@
     "random": "^2.1.1"
   },
   "devDependencies": {
-    "eslint": "^6.1.0"
+    "eslint": "^6.1.0",
+    "mocha": "^6.2.0",
+    "node-red": "^0.20.7",
+    "node-red-node-test-helper": "^0.2.3"
   },
   "prettier": {
     "trailingComma": "es5",
