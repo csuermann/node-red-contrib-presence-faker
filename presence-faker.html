@@ -1,154 +1,156 @@
 <script type="text/javascript">
-  const calcDuration = type => {
-    // type can be 'min' or 'max'
-    let hours = Number($(`#node-input-${type}DurationHours`).val())
-    let minutes = Number($(`#node-input-${type}DurationMinutes`).val())
-    let seconds = Number($(`#node-input-${type}DurationSeconds`).val())
-    return hours * 3600 + minutes * 60 + seconds
-  }
+  ;(function() {
+    const calcDuration = type => {
+      // type can be 'min' or 'max'
+      let hours = Number($(`#node-input-${type}DurationHours`).val())
+      let minutes = Number($(`#node-input-${type}DurationMinutes`).val())
+      let seconds = Number($(`#node-input-${type}DurationSeconds`).val())
+      return hours * 3600 + minutes * 60 + seconds
+    }
 
-  RED.nodes.registerType('presence-faker', {
-    category: 'smart home',
-    color: '#FFAAAA',
-    defaults: {
-      name: { value: '' },
-      onPayload: {
-        value: '',
-        validate: RED.validators.typedInput('payloadType'),
-      },
-      onPayloadType: { value: 'string' },
-      onTopic: { value: '', required: false },
-      offPayload: {
-        value: '',
-        validate: RED.validators.typedInput('payloadType'),
-      },
-      offPayloadType: { value: 'string' },
-      offTopic: { value: '', required: false },
-      windowBegin: {
-        value: '07:30',
-        required: true,
-        validate: RED.validators.regex(
-          /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/
-        ),
-      },
-      windowEnd: {
-        value: '17:30',
-        required: true,
-        validate: RED.validators.regex(
-          /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/
-        ),
-      },
-      minDurationHours: { value: 0, required: true },
-      minDurationMinutes: { value: 0, required: true },
-      minDurationSeconds: { value: 0, required: true },
-      minDuration: { value: 0 },
-      maxDurationHours: { value: 0, required: true },
-      maxDurationMinutes: { value: 0, required: true },
-      maxDurationSeconds: { value: 0, required: true },
-      maxDuration: { value: 0 },
-      minCount: {
-        value: 1,
-        required: true,
-        validate: function (v) {
-          if (!/\d+/.exec(v)) {
-            return false
-          } else {
+    RED.nodes.registerType('presence-faker', {
+      category: 'smart home',
+      color: '#FFAAAA',
+      defaults: {
+        name: { value: '' },
+        onPayload: {
+          value: '',
+          validate: RED.validators.typedInput('payloadType'),
+        },
+        onPayloadType: { value: 'string' },
+        onTopic: { value: '', required: false },
+        offPayload: {
+          value: '',
+          validate: RED.validators.typedInput('payloadType'),
+        },
+        offPayloadType: { value: 'string' },
+        offTopic: { value: '', required: false },
+        windowBegin: {
+          value: '07:30',
+          required: true,
+          validate: RED.validators.regex(
+            /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/
+          ),
+        },
+        windowEnd: {
+          value: '17:30',
+          required: true,
+          validate: RED.validators.regex(
+            /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/
+          ),
+        },
+        minDurationHours: { value: 0, required: true },
+        minDurationMinutes: { value: 0, required: true },
+        minDurationSeconds: { value: 0, required: true },
+        minDuration: { value: 0 },
+        maxDurationHours: { value: 0, required: true },
+        maxDurationMinutes: { value: 0, required: true },
+        maxDurationSeconds: { value: 0, required: true },
+        maxDuration: { value: 0 },
+        minCount: {
+          value: 1,
+          required: true,
+          validate: function(v) {
+            if (!/\d+/.exec(v)) {
+              return false
+            } else {
+              return true
+            }
+          },
+        },
+        maxCount: {
+          value: 1,
+          required: true,
+          validate: function(v) {
+            if (!/\d+/.exec(v)) {
+              return false
+            }
+
+            if (calcDuration('min') > calcDuration('max')) {
+              return false
+            }
+
             return true
-          }
+          },
         },
+        startupBehavior: { value: 'onMsg' },
+        actionOnDisable: { value: 'none' },
       },
-      maxCount: {
-        value: 1,
-        required: true,
-        validate: function (v) {
-          if (!/\d+/.exec(v)) {
-            return false
-          }
-
-          if (calcDuration('min') > calcDuration('max')) {
-            return false
-          }
-
-          return true
-        },
+      inputs: 1,
+      outputs: 1,
+      icon: 'light.png',
+      label: function() {
+        return this.name || 'presence-faker'
       },
-      startupBehavior: { value: 'onMsg' },
-      actionOnDisable: { value: 'none' },
-    },
-    inputs: 1,
-    outputs: 1,
-    icon: 'light.png',
-    label: function () {
-      return this.name || 'presence-faker'
-    },
-    oneditprepare: function () {
-      //ON Payload
-      if (this.onPayloadType == null) {
-        if (this.onPayload == '') {
-          this.onPayloadType = 'date'
-        } else {
+      oneditprepare: function() {
+        //ON Payload
+        if (this.onPayloadType == null) {
+          if (this.onPayload == '') {
+            this.onPayloadType = 'date'
+          } else {
+            this.onPayloadType = 'str'
+          }
+        } else if (
+          this.onPayloadType === 'string' ||
+          this.onPayloadType === 'none'
+        ) {
           this.onPayloadType = 'str'
         }
-      } else if (
-        this.onPayloadType === 'string' ||
-        this.onPayloadType === 'none'
-      ) {
-        this.onPayloadType = 'str'
-      }
-      $('#node-input-onPayloadType').val(this.onPayloadType)
-      $('#node-input-onPayload').typedInput({
-        default: 'str',
-        typeField: $('#node-input-onPayloadType'),
-        types: [
-          //'flow',
-          //'global',
-          'str',
-          'num',
-          'bool',
-          'json',
-          //'bin',
-          //'date',
-          //'env'
-        ],
-      })
-      $('#node-input-onPayload').typedInput('type', this.onPayloadType)
+        $('#node-input-onPayloadType').val(this.onPayloadType)
+        $('#node-input-onPayload').typedInput({
+          default: 'str',
+          typeField: $('#node-input-onPayloadType'),
+          types: [
+            //'flow',
+            //'global',
+            'str',
+            'num',
+            'bool',
+            'json',
+            //'bin',
+            //'date',
+            //'env'
+          ],
+        })
+        $('#node-input-onPayload').typedInput('type', this.onPayloadType)
 
-      //OFF Payload
-      if (this.offPayloadType == null) {
-        if (this.offPayload == '') {
-          this.offPayloadType = 'date'
-        } else {
+        //OFF Payload
+        if (this.offPayloadType == null) {
+          if (this.offPayload == '') {
+            this.offPayloadType = 'date'
+          } else {
+            this.offPayloadType = 'str'
+          }
+        } else if (
+          this.offPayloadType === 'string' ||
+          this.offPayloadType === 'none'
+        ) {
           this.offPayloadType = 'str'
         }
-      } else if (
-        this.offPayloadType === 'string' ||
-        this.offPayloadType === 'none'
-      ) {
-        this.offPayloadType = 'str'
-      }
-      $('#node-input-offPayloadType').val(this.offPayloadType)
-      $('#node-input-offPayload').typedInput({
-        default: 'str',
-        typeField: $('#node-input-offPayloadType'),
-        types: [
-          //'flow',
-          //'global',
-          'str',
-          'num',
-          'bool',
-          'json',
-          //'bin',
-          //'date',
-          //'env'
-        ],
-      })
-      $('#node-input-offPayload').typedInput('type', this.offPayloadType)
-    },
-    oneditsave: function () {
-      $('#node-input-minDuration').val(calcDuration('min'))
-      $('#node-input-maxDuration').val(calcDuration('max'))
-    },
-  })
+        $('#node-input-offPayloadType').val(this.offPayloadType)
+        $('#node-input-offPayload').typedInput({
+          default: 'str',
+          typeField: $('#node-input-offPayloadType'),
+          types: [
+            //'flow',
+            //'global',
+            'str',
+            'num',
+            'bool',
+            'json',
+            //'bin',
+            //'date',
+            //'env'
+          ],
+        })
+        $('#node-input-offPayload').typedInput('type', this.offPayloadType)
+      },
+      oneditsave: function() {
+        $('#node-input-minDuration').val(calcDuration('min'))
+        $('#node-input-maxDuration').val(calcDuration('max'))
+      },
+    })
+  })()
 </script>
 <style>
   .form-row label {
