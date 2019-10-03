@@ -2,8 +2,8 @@ const { createSchedule, stripPastBlocks } = require('./pf')
 const CronJob = require('cron').CronJob
 const dayjs = require('dayjs')
 
-module.exports = function(RED) {
-  function PresenceFakerNode(config) {
+module.exports = function (RED) {
+  function PresenceFakerNode (config) {
     RED.nodes.createNode(this, config)
 
     const node = this
@@ -12,31 +12,31 @@ module.exports = function(RED) {
     let msgCrons = []
     let isEnabled = false
 
-    const debug = function(debugMsg) {
+    const debug = function (debugMsg) {
       if (RED.settings.presenceFakerDebug) {
         node.warn(debugMsg)
       }
     }
 
-    const setNodeStatusForBlock = function(block) {
+    const setNodeStatusForBlock = function (block) {
       node.status({
         fill: 'yellow',
         shape: block.isOn ? 'dot' : 'ring',
         text: `${block.isOn ? 'ON' : 'OFF'} [${block.beginString} - ${
           block.endString
-        }]`,
+        }]`
       })
     }
 
-    const setNodeStatus = function(text) {
+    const setNodeStatus = function (text) {
       node.status({
         fill: 'grey',
         shape: 'dot',
-        text: text,
+        text: text
       })
     }
 
-    const isNowWithinWindow = function() {
+    const isNowWithinWindow = function () {
       const now = dayjs()
       const begin = dayjs(now.format('YYYY-MM-DD') + 'T' + config.windowBegin)
       const end = dayjs(now.format('YYYY-MM-DD') + 'T' + config.windowEnd)
@@ -48,13 +48,13 @@ module.exports = function(RED) {
       )
     }
 
-    const scheduleWindowCrons = function() {
+    const scheduleWindowCrons = function () {
       stopCrons()
 
       const now = dayjs()
       const begin = dayjs(now.format('YYYY-MM-DD') + 'T' + config.windowBegin)
       const end = dayjs(now.format('YYYY-MM-DD') + 'T' + config.windowEnd)
-      const windowBeginCronCallback = function() {
+      const windowBeginCronCallback = function () {
         const schedule = stripPastBlocks(createSchedule(config))
         debug(schedule)
         const currentBlock = schedule.shift()
@@ -70,7 +70,7 @@ module.exports = function(RED) {
 
       windowBeginCron = new CronJob({
         cronTime: `0 ${begin.minute()} ${begin.hour()} * * *`, // sec min hour dom month dow
-        onTick: windowBeginCronCallback,
+        onTick: windowBeginCronCallback
       })
       windowBeginCron.start()
 
@@ -79,7 +79,7 @@ module.exports = function(RED) {
         // cronTime: fakeCronTime,
         onTick: () => {
           setNodeStatus('cycle completed')
-        },
+        }
       })
       windowEndCron.start()
 
@@ -90,13 +90,13 @@ module.exports = function(RED) {
       )
     }
 
-    const scheduleMsgCrons = function(schedule) {
+    const scheduleMsgCrons = function (schedule) {
       msgCrons = schedule.map(block => {
         const cron = new CronJob({
           cronTime: block.begin.toDate(),
           onTick: () => {
             executeBlock(block)
-          },
+          }
         })
 
         try {
@@ -109,7 +109,7 @@ module.exports = function(RED) {
       })
     }
 
-    const stopCrons = function() {
+    const stopCrons = function () {
       if (windowBeginCron) {
         windowBeginCron.stop()
         windowEndCron.stop()
@@ -131,7 +131,7 @@ module.exports = function(RED) {
       setNodeStatusForBlock(block)
     }
 
-    const ejectMsg = function(isOn) {
+    const ejectMsg = function (isOn, sendHandler) {
       const castPayload = (payload, payloadType) => {
         if (payloadType === 'num') {
           return Number(payload)
@@ -146,14 +146,25 @@ module.exports = function(RED) {
 
       let payload = isOn ? config.onPayload : config.offPayload
       let payloadType = isOn ? config.onPayloadType : config.offPayloadType
-
-      node.send({
+      let msgToSend = {
         topic: isOn ? config.onTopic : config.offTopic,
-        payload: castPayload(payload, payloadType),
-      })
+        payload: castPayload(payload, payloadType)
+      }
+
+      if (sendHandler) {
+        sendHandler(msgToSend)
+      } else {
+        node.send(msgToSend)
+      }
     }
 
-    node.on('input', function(msg) {
+    node.on('input', function (msg, send, done) {
+      send =
+        send ||
+        function () {
+          node.send.apply(node, arguments)
+        }
+
       if (
         msg.payload === true ||
         msg.payload === 'true' ||
@@ -173,7 +184,7 @@ module.exports = function(RED) {
         isEnabled = false
         stopCrons()
         if (isNowWithinWindow() && config.actionOnDisable !== 'none') {
-          ejectMsg(config.actionOnDisable === 'on')
+          ejectMsg(config.actionOnDisable === 'on', send)
         }
         setNodeStatus('inactive')
       } else if (typeof msg.payload === 'object') {
@@ -209,12 +220,16 @@ module.exports = function(RED) {
           node.emit('input', { payload: true })
         }
       }
+
+      if (done) {
+        done()
+      }
     })
 
-    node.on('close', function() {
+    node.on('close', function () {
       stopCrons()
     })
-    ;(function() {
+    ;(function () {
       // on startup:
       if (config.startupBehavior === 'onStartup') {
         node.emit('input', { payload: true })
