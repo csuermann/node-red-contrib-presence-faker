@@ -1,7 +1,7 @@
 {
   "name": "node-red-contrib-presence-faker",
-  "version": "1.5.4",
-  "description": "This Node-RED node can pretend that your home is occupied by switching devices (e.g. lights) on and off at random (configurable) times.",
+  "version": "1.5.5",
+  "description": "Let your home appear occupied by switching devices (e.g. lights) on and off at random (configurable) times.",
   "main": "index.js",
   "author": "Cornelius Suermann",
   "license": "MIT",
