@@ -24,7 +24,7 @@ module.exports = function (RED) {
         shape: block.isOn ? 'dot' : 'ring',
         text: `${block.isOn ? 'ON' : 'OFF'} [${block.beginString} - ${
           block.endString
-        }]`
+        }]`,
       })
     }
 
@@ -32,14 +32,25 @@ module.exports = function (RED) {
       node.status({
         fill: 'grey',
         shape: 'dot',
-        text: text
+        text: text,
       })
     }
 
     const isNowWithinWindow = function () {
       const now = dayjs()
-      const begin = dayjs(now.format('YYYY-MM-DD') + 'T' + config.windowBegin)
-      const end = dayjs(now.format('YYYY-MM-DD') + 'T' + config.windowEnd)
+      let begin = dayjs(now.format('YYYY-MM-DD') + 'T' + config.windowBegin)
+      let end = dayjs(now.format('YYYY-MM-DD') + 'T' + config.windowEnd)
+
+      const duration = end.diff(begin, 'seconds')
+
+      // handle special case of windowBegin > windowEnd, i.e. windows spanning two days
+      if (duration < 0) {
+        if (now.isBefore(end)) {
+          begin = begin.subtract(1, 'day')
+        } else if (now.isAfter(begin)) {
+          end = end.add(1, 'day')
+        }
+      }
 
       return (
         (now.isAfter(begin) && now.isBefore(end)) ||
@@ -70,7 +81,7 @@ module.exports = function (RED) {
 
       windowBeginCron = new CronJob({
         cronTime: `0 ${begin.minute()} ${begin.hour()} * * *`, // sec min hour dom month dow
-        onTick: windowBeginCronCallback
+        onTick: windowBeginCronCallback,
       })
       windowBeginCron.start()
 
@@ -79,7 +90,7 @@ module.exports = function (RED) {
         // cronTime: fakeCronTime,
         onTick: () => {
           setNodeStatus('cycle completed')
-        }
+        },
       })
       windowEndCron.start()
 
@@ -96,7 +107,7 @@ module.exports = function (RED) {
           cronTime: block.begin.toDate(),
           onTick: () => {
             executeBlock(block)
-          }
+          },
         })
 
         try {
@@ -148,7 +159,7 @@ module.exports = function (RED) {
       let payloadType = isOn ? config.onPayloadType : config.offPayloadType
       let msgToSend = {
         topic: isOn ? config.onTopic : config.offTopic,
-        payload: castPayload(payload, payloadType)
+        payload: castPayload(payload, payloadType),
       }
 
       if (sendHandler) {
