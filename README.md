@@ -18,7 +18,7 @@ Properties can be configured statically using the editor or dynamically by injec
 
 ### Dynamic Configuration
 
-You can overwrite the static configuration at runtime by passing a config object as msg.payload to the presence-faker node. All attributes are optional. `minDuration` and `maxDuration` are expressed in seconds.
+You can overwrite the static configuration at runtime by passing a config object as `msg.payload` to the presence-faker node. All attributes are optional. `minDuration` and `maxDuration` are expressed in seconds.
 
 ```
 {
