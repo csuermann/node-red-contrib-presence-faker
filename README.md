@@ -27,7 +27,7 @@ You can overwrite the static configuration at runtime by passing a config object
     "minDuration": 60,
     "maxDuration": 600,
     "minCount": 10,
-    "maxCount": 25
+    "maxCount": 30
 }
 ```
 
