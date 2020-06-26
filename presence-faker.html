@@ -1,6 +1,6 @@
 <script type="text/javascript">
-  ;(function() {
-    const calcDuration = type => {
+  ;(function () {
+    const calcDuration = (type) => {
       // type can be 'min' or 'max'
       let hours = Number($(`#node-input-${type}DurationHours`).val())
       let minutes = Number($(`#node-input-${type}DurationMinutes`).val())
@@ -50,7 +50,7 @@
         minCount: {
           value: 1,
           required: true,
-          validate: function(v) {
+          validate: function (v) {
             if (!/\d+/.exec(v)) {
               return false
             } else {
@@ -61,7 +61,7 @@
         maxCount: {
           value: 1,
           required: true,
-          validate: function(v) {
+          validate: function (v) {
             if (!/\d+/.exec(v)) {
               return false
             }
@@ -75,14 +75,15 @@
         },
         startupBehavior: { value: 'onMsg' },
         actionOnDisable: { value: 'none' },
+        isLoggingEnabled: { value: false },
       },
       inputs: 1,
       outputs: 1,
       icon: 'light.png',
-      label: function() {
+      label: function () {
         return this.name || 'presence-faker'
       },
-      oneditprepare: function() {
+      oneditprepare: function () {
         //ON Payload
         if (this.onPayloadType == null) {
           if (this.onPayload == '') {
@@ -145,7 +146,7 @@
         })
         $('#node-input-offPayload').typedInput('type', this.offPayloadType)
       },
-      oneditsave: function() {
+      oneditsave: function () {
         $('#node-input-minDuration').val(calcDuration('min'))
         $('#node-input-maxDuration').val(calcDuration('max'))
       },
@@ -363,6 +364,11 @@
       <option value="on">send ON message</option>
       <option value="off">send OFF message</option>
     </select>
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-isLoggingEnabled"><i class="fa fa-bug"></i> logging</label>
+    <input type="checkbox" id="node-input-isLoggingEnabled" style="width:30px; margin:0px"> log debug messages to console
   </div>
 </script>
 

@@ -13,7 +13,7 @@ module.exports = function (RED) {
     let isEnabled = false
 
     const debug = function (debugMsg) {
-      if (RED.settings.presenceFakerDebug) {
+      if (config.isLoggingEnabled) {
         node.warn(debugMsg)
       }
     }
@@ -34,6 +34,7 @@ module.exports = function (RED) {
         shape: 'dot',
         text: text,
       })
+      debug(`new node status: ${text}`)
     }
 
     const isNowWithinWindow = function () {
@@ -67,7 +68,6 @@ module.exports = function (RED) {
       const end = dayjs(now.format('YYYY-MM-DD') + 'T' + config.windowEnd)
       const windowBeginCronCallback = function () {
         const schedule = stripPastBlocks(createSchedule(config))
-        debug(schedule)
         const currentBlock = schedule.shift()
         executeBlock(currentBlock)
         scheduleMsgCrons(schedule)
@@ -118,6 +118,9 @@ module.exports = function (RED) {
 
         return cron
       })
+
+      debug(`installed new schedule with ${schedule.length} blocks`)
+      debug(schedule)
     }
 
     const stopCrons = function () {
