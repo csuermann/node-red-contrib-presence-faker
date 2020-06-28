@@ -19,13 +19,16 @@ module.exports = function (RED) {
     }
 
     const setNodeStatusForBlock = function (block) {
+      const text = `${block.isOn ? 'ON' : 'OFF'} [${block.beginString} - ${
+        block.endString
+      }]`
+
       node.status({
         fill: 'yellow',
         shape: block.isOn ? 'dot' : 'ring',
-        text: `${block.isOn ? 'ON' : 'OFF'} [${block.beginString} - ${
-          block.endString
-        }]`,
+        text,
       })
+      debug(`new node status: ${text}`)
     }
 
     const setNodeStatus = function (text) {
@@ -53,11 +56,14 @@ module.exports = function (RED) {
         }
       }
 
-      return (
+      const result =
         (now.isAfter(begin) && now.isBefore(end)) ||
         now.isSame(begin) ||
         now.isSame(end)
-      )
+
+      debug(`isNowWithinWindow? ${result ? 'Yes' : 'No'}`)
+
+      return result
     }
 
     const scheduleWindowCrons = function () {
@@ -67,6 +73,7 @@ module.exports = function (RED) {
       const begin = dayjs(now.format('YYYY-MM-DD') + 'T' + config.windowBegin)
       const end = dayjs(now.format('YYYY-MM-DD') + 'T' + config.windowEnd)
       const windowBeginCronCallback = function () {
+        debug('executing windowBeginCronCallback')
         const schedule = stripPastBlocks(createSchedule(config))
         const currentBlock = schedule.shift()
         executeBlock(currentBlock)
@@ -119,8 +126,10 @@ module.exports = function (RED) {
         return cron
       })
 
-      debug(`installed new schedule with ${schedule.length} blocks`)
-      debug(schedule)
+      debug(
+        `installed new schedule with ${schedule.length} blocks: ` +
+          JSON.stringify(schedule)
+      )
     }
 
     const stopCrons = function () {
@@ -130,17 +139,22 @@ module.exports = function (RED) {
         debug(`window crons deleted`)
       }
 
+      let deletedCronsCount = 0
+
       if (msgCrons.length > 0) {
         msgCrons.forEach(cron => {
           cron.stop()
+          deletedCronsCount++
         })
 
-        debug(`${msgCrons.length} message crons deleted`)
         msgCrons = []
       }
+
+      debug(`${deletedCronsCount} message crons deleted`)
     }
 
     const executeBlock = block => {
+      debug('executing block: ' + JSON.stringify(block))
       ejectMsg(block.isOn)
       setNodeStatusForBlock(block)
     }

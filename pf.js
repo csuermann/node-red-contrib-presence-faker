@@ -18,12 +18,22 @@ function createSchedule ({
 
   // handle special case of windowBegin > windowEnd, i.e. windows spanning two days
   if (windowDuration < 0) {
-    windowDuration = 60 * 60 * 24 - windowDuration
+    windowDuration = 60 * 60 * 24 + windowDuration
 
     if (now.isBefore(windowEnd)) {
       windowBegin = windowBegin.subtract(1, 'day')
     }
   }
+
+  // console.log(
+  //   'windowDuration: ' +
+  //     windowDuration +
+  //     ' sec / ' +
+  //     windowDuration / 60 +
+  //     ' min / ' +
+  //     windowDuration / (60 * 60) +
+  //     ' h'
+  // )
 
   const calcRandomDuration = () =>
     random.int(Number(minDuration), Number(maxDuration))
@@ -90,7 +100,7 @@ function createSchedule ({
   offBlocks[0].duration += diff
 
   let schedule = _combineBlocks(offBlocks, onBlocks)
-  console.log(schedule)
+  //console.log(schedule)
   return _calcScheduleTimes(schedule, windowBegin)
 }
 
