@@ -75,6 +75,8 @@
         },
         startupBehavior: { value: 'onMsg' },
         actionOnDisable: { value: 'none' },
+        firstBlockType: { value: 'off' },
+        lastBlockType: { value: 'off' },
         isLoggingEnabled: { value: false },
       },
       inputs: 1,
@@ -347,6 +349,22 @@
   <div class="form-row">
     <label for="node-input-offTopic"><i class="fa fa-tasks"></i> <span>OFF Topic</span></label>
     <input type="text" id="node-input-offTopic">
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-firstBlockType"><i class="fa fa-step-backward"></i> <span>first block</span></label>
+    <select id="node-input-firstBlockType" style="width:70%">
+      <option value="on">ON message</option>
+      <option value="off">OFF message</option>
+    </select>
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-lastBlockType"><i class="fa fa-step-forward"></i> <span>last block</span></label>
+    <select id="node-input-lastBlockType" style="width:70%">
+      <option value="on">ON message</option>
+      <option value="off">OFF message</option>
+    </select>
   </div>
 
   <div class="form-row">

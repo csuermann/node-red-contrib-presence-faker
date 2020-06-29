@@ -8,6 +8,8 @@ function createSchedule ({
   maxDuration,
   minCount,
   maxCount,
+  firstBlockType,
+  lastBlockType,
 }) {
   const now = dayjs()
 
@@ -24,16 +26,6 @@ function createSchedule ({
       windowBegin = windowBegin.subtract(1, 'day')
     }
   }
-
-  // console.log(
-  //   'windowDuration: ' +
-  //     windowDuration +
-  //     ' sec / ' +
-  //     windowDuration / 60 +
-  //     ' min / ' +
-  //     windowDuration / (60 * 60) +
-  //     ' h'
-  // )
 
   const calcRandomDuration = () =>
     random.int(Number(minDuration), Number(maxDuration))
@@ -76,7 +68,10 @@ function createSchedule ({
   // how much time is left for OFF blocks?
   let sumOffDurations = windowDuration - sumOnDurations
 
-  const offBlockCount = onBlocks.length + 1
+  const offBlockCount =
+    onBlocks.length +
+    (firstBlockType === 'off' ? 1 : 0) +
+    (lastBlockType === 'off' ? 0 : -1)
 
   for (let i = 0; i < offBlockCount; i++) {
     offBlocks.push({
@@ -99,19 +94,26 @@ function createSchedule ({
   //apply diff to 1st off-block
   offBlocks[0].duration += diff
 
-  let schedule = _combineBlocks(offBlocks, onBlocks)
+  let schedule = _combineBlocks(offBlocks, onBlocks, firstBlockType)
   //console.log(schedule)
   return _calcScheduleTimes(schedule, windowBegin)
 }
 
-function _combineBlocks (offBlocks, onBlocks) {
+function _combineBlocks (offBlocks, onBlocks, firstBlockType) {
   let schedule = []
 
-  for (let i = 0; i < offBlocks.length; i++) {
-    schedule.push(offBlocks[i])
+  const greenBlocks = firstBlockType === 'off' ? offBlocks : onBlocks
+  const blueBlocks = firstBlockType === 'off' ? onBlocks : offBlocks
 
-    if (onBlocks[i]) {
-      schedule.push(onBlocks[i])
+  const iterations = Math.max(greenBlocks.length, blueBlocks.length)
+
+  for (let i = 0; i < iterations; i++) {
+    if (greenBlocks[i]) {
+      schedule.push(greenBlocks[i])
+    }
+
+    if (blueBlocks[i]) {
+      schedule.push(blueBlocks[i])
     }
   }
 

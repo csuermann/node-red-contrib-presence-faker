@@ -75,6 +75,7 @@ module.exports = function (RED) {
       const windowBeginCronCallback = function () {
         debug('executing windowBeginCronCallback')
         const schedule = stripPastBlocks(createSchedule(config))
+        debug('created new schedule: ' + JSON.stringify(schedule))
         const currentBlock = schedule.shift()
         executeBlock(currentBlock)
         scheduleMsgCrons(schedule)
@@ -126,10 +127,7 @@ module.exports = function (RED) {
         return cron
       })
 
-      debug(
-        `installed new schedule with ${schedule.length} blocks: ` +
-          JSON.stringify(schedule)
-      )
+      debug(`installed crons for ${schedule.length} blocks`)
     }
 
     const stopCrons = function () {
