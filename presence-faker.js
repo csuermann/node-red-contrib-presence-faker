@@ -260,7 +260,9 @@ module.exports = function (RED) {
       if (config.startupBehavior === 'onStartup') {
         node.emit('input', { payload: true })
       } else {
-        setNodeStatus('inactive upon load')
+        setNodeStatus('starting up...')
+
+        setTimeout(() => setNodeStatus('inactive upon load'), 1000)
       }
     })()
   }
