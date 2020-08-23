@@ -91,8 +91,10 @@ function createSchedule ({
   //do off-durations match sumOffDurations?
   const diff = sumOffDurations - sumDurations(offBlocks)
 
-  //apply diff to 1st off-block
-  offBlocks[0].duration += diff
+  //apply diff to 1st off-block (if it exists)
+  if (offBlocks[0]) {
+    offBlocks[0].duration += diff
+  }
 
   let schedule = _combineBlocks(offBlocks, onBlocks, firstBlockType)
   //console.log(schedule)
