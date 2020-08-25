@@ -76,8 +76,10 @@ module.exports = function (RED) {
         debug('executing windowBeginCronCallback')
         const schedule = stripPastBlocks(createSchedule(config))
         debug('created new schedule: ' + JSON.stringify(schedule))
-        const currentBlock = schedule.shift()
-        executeBlock(currentBlock)
+        if (schedule.length > 0) {
+          const currentBlock = schedule.shift()
+          executeBlock(currentBlock)
+        }
         scheduleMsgCrons(schedule)
       }
 
