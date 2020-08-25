@@ -221,26 +221,32 @@ module.exports = function (RED) {
         if (msg.payload.windowBegin) {
           debug(`new windowBegin: ${msg.payload.windowBegin}`)
           config.windowBegin = msg.payload.windowBegin
+          this.context().set('windowBegin', config.windowBegin)
         }
         if (msg.payload.windowEnd) {
           debug(`new windowEnd: ${msg.payload.windowEnd}`)
           config.windowEnd = msg.payload.windowEnd
+          this.context().set('windowEnd', config.windowEnd)
         }
         if (msg.payload.minDuration) {
           debug(`new minDuration: ${msg.payload.minDuration}`)
           config.minDuration = Number(msg.payload.minDuration)
+          this.context().set('minDuration', config.minDuration)
         }
         if (msg.payload.maxDuration) {
           debug(`new maxDuration: ${msg.payload.maxDuration}`)
           config.maxDuration = Number(msg.payload.maxDuration)
+          this.context().set('maxDuration', config.maxDuration)
         }
         if (msg.payload.minCount) {
           debug(`new minCount: ${msg.payload.minCount}`)
           config.minCount = Number(msg.payload.minCount)
+          this.context().set('minCount', config.minCount)
         }
         if (msg.payload.maxCount) {
           debug(`new maxCount: ${msg.payload.maxCount}`)
           config.maxCount = Number(msg.payload.maxCount)
+          this.context().set('maxCount', config.maxCount)
         }
 
         // force re-scheduling

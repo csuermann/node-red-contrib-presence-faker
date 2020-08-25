@@ -86,6 +86,49 @@
         return this.name || 'presence-faker'
       },
       oneditprepare: function () {
+        fetch('/context/node/' + this.id, { method: 'GET' })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.memory.windowBegin || data.memory.windowEnd) {
+              $('#lbl-window').addClass('tooltip')
+              $('#hint-window').html(
+                'current value:<br />' +
+                  (data.memory.windowBegin?.msg || this.windowBegin) +
+                  ' - ' +
+                  (data.memory.windowEnd?.msg || this.windowEnd)
+              )
+            }
+
+            if (data.memory.minCount || data.memory.maxCount) {
+              $('#lbl-onTimes').addClass('tooltip')
+              $('#hint-onTimes').html(
+                'current value:<br />' +
+                  (data.memory.minCount?.msg || this.minCount) +
+                  ' - ' +
+                  (data.memory.maxCount?.msg || this.maxCount)
+              )
+            }
+
+            if (data.memory.minDuration) {
+              $('#lbl-onMinDuration').addClass('tooltip')
+              $('#hint-onMinDuration').html(
+                'current value:<br />' +
+                  (data.memory.minDuration?.msg || this.minDuration) +
+                  ' sec'
+              )
+            }
+
+            if (data.memory.maxDuration) {
+              $('#lbl-onMaxDuration').addClass('tooltip')
+              $('#hint-onMaxDuration').html(
+                'current value:<br />' +
+                  (data.memory.maxDuration?.msg || this.maxDuration) +
+                  ' sec'
+              )
+            }
+          })
+          .catch((e) => console.log(e))
+
         //ON Payload
         if (this.onPayloadType == null) {
           if (this.onPayload == '') {
@@ -159,6 +202,33 @@
   .form-row label {
     width: 120px;
   }
+
+  .tooltip {
+    color: #ff5733;
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted; /* If you want dots under the hoverable text */
+  }
+
+  /* Tooltip text */
+  .tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    z-index: 1;
+  }
+
+  /* Show the tooltip text when you mouse over the tooltip container */
+  .tooltip:hover .tooltiptext {
+    visibility: visible;
+  }
 </style>
 
 <script type="text/x-red" data-template-name="presence-faker">
@@ -168,19 +238,19 @@
   </div>
 
   <div class="form-row">
-    <label for="node-input-windowBegin"><i class="fa fa-clock-o"></i> window</label>
+    <label for="node-input-windowBegin"><span id="lbl-window"><i class="fa fa-clock-o"></i> window <span id="hint-window" class="tooltiptext"></span></span></label>
     begin: <input type="text" id="node-input-windowBegin" placeholder="HH:MM" style="width:75px">
     end: <input type="text" id="node-input-windowEnd" placeholder="HH:MM" style="width:75px">
   </div>
 
   <div class="form-row">
-    <label for="node-input-minCount">ON times</label>
+    <label for="node-input-minCount"><span id="lbl-onTimes">ON times <span id="hint-onTimes" class="tooltiptext"></span></span></label>
     min: <input type="text" id="node-input-minCount" placeholder="" style="width:50px">
     max: <input type="text" id="node-input-maxCount" placeholder="" style="width:50px">
   </div>
 
   <div class="form-row">
-    <label for="node-input-minDurationHours">ON min duration</label>
+    <label for="node-input-minDurationHours"><span id="lbl-onMinDuration">ON min duration <span id="hint-onMinDuration" class="tooltiptext"></span></span></label>
     <select style="width:50px; margin-left:0px;" id="node-input-minDurationHours">
       <option value="0">00</option>
       <option value="1">01</option>
@@ -255,7 +325,7 @@
   </div>
 
   <div class="form-row">
-    <label for="node-input-maxDurationHours">ON max duration</label>
+    <label for="node-input-maxDurationHours"><span id="lbl-onMaxDuration">ON max duration  <span id="hint-onMaxDuration" class="tooltiptext"></span></span></label>
     <select style="width:50px; margin-left:0px;" id="node-input-maxDurationHours">
       <option value="0">00</option>
       <option value="1">01</option>
