@@ -1,9 +1,9 @@
-const { createSchedule, stripPastBlocks } = require('./pf')
+const { createSchedule, stripPastBlocks, setDebugFn } = require('./pf')
 const CronJob = require('cron').CronJob
 const dayjs = require('dayjs')
 
 module.exports = function (RED) {
-  function PresenceFakerNode (config) {
+  function PresenceFakerNode(config) {
     RED.nodes.createNode(this, config)
 
     const node = this
@@ -17,6 +17,8 @@ module.exports = function (RED) {
         node.warn(debugMsg)
       }
     }
+
+    setDebugFn(debug)
 
     const setNodeStatusForBlock = function (block) {
       const text = `${block.isOn ? 'ON' : 'OFF'} [${block.beginString} - ${
@@ -112,7 +114,7 @@ module.exports = function (RED) {
     }
 
     const scheduleMsgCrons = function (schedule) {
-      msgCrons = schedule.map(block => {
+      msgCrons = schedule.map((block) => {
         const cron = new CronJob({
           cronTime: block.begin.toDate(),
           onTick: () => {
@@ -142,7 +144,7 @@ module.exports = function (RED) {
       let deletedCronsCount = 0
 
       if (msgCrons.length > 0) {
-        msgCrons.forEach(cron => {
+        msgCrons.forEach((cron) => {
           cron.stop()
           deletedCronsCount++
         })
@@ -153,7 +155,7 @@ module.exports = function (RED) {
       debug(`${deletedCronsCount} message crons deleted`)
     }
 
-    const executeBlock = block => {
+    const executeBlock = (block) => {
       debug('executing block: ' + JSON.stringify(block))
       ejectMsg(block.isOn)
       setNodeStatusForBlock(block)
