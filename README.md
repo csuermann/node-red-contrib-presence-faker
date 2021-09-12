@@ -20,7 +20,7 @@ Properties can be configured statically using the editor or dynamically by injec
 
 You can overwrite the static configuration at runtime by passing a config object as `msg.payload` to the presence-faker node. All attributes are optional. `minDuration` and `maxDuration` are expressed in seconds.
 
-```
+```javascript
 {
     "windowBegin": "00:00",
     "windowEnd": "23:59:59",
@@ -32,6 +32,12 @@ You can overwrite the static configuration at runtime by passing a config object
 ```
 
 If the presence-faker node is currently enabled, this will instantly create a new schedule with the new configuration being applied. Otherwise the changes will take effect as soon as the presence-faker node gets enabled.
+
+### Combining presence-faker with suncron
+
+You can combine the presence-faker node with the suncron node in order to dynamically set `windowBegin` and/or `windowEnd` based on the position of the sun:
+
+[Example](https://gist.github.com/csuermann/604f846f4b7bc3a518dc6385c16e3a48)
 
 ## Contributions and Suggestions
 
