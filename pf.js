@@ -1,6 +1,9 @@
-const random = require('random')
 const dayjs = require('dayjs')
 let debug = (msg) => null
+
+function randomInt(min, max) {
+  return Math.floor(Math.random() * max) + min
+}
 
 function setDebugFn(debugFn) {
   debug = debugFn
@@ -33,12 +36,12 @@ function createSchedule({
   }
 
   const calcRandomDuration = () =>
-    random.int(Number(minDuration), Number(maxDuration))
+    randomInt(Number(minDuration), Number(maxDuration))
 
   const calcRandomCount = () =>
     calcRandomNumber(Number(minCount), Number(maxCount))
 
-  const calcRandomNumber = (min, max) => random.int(min, max)
+  const calcRandomNumber = (min, max) => randomInt(min, max)
 
   const sumDurations = (blocks) =>
     blocks.reduce((prev, curr) => prev + curr.duration, 0)

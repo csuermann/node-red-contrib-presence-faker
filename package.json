@@ -1,7 +1,7 @@
 {
   "name": "node-red-contrib-presence-faker",
   "version": "1.5.7",
-  "description": "Let your home appear occupied by switching devices (e.g. lights) on and off at random (configurable) times.",
+  "description": "Simulates home occupancy by intermittently activating and deactivating devices (e.g. lights) at random intervals",
   "main": "index.js",
   "author": "Cornelius Suermann",
   "license": "MIT",
@@ -15,6 +15,7 @@
     "occupation",
     "simulator"
   ],
+  "type": "commonjs",
   "repository": {
     "type": "git",
     "url": "https://github.com/csuermann/presence-faker"
@@ -28,15 +29,14 @@
     }
   },
   "dependencies": {
-    "cron": "^1.8.2",
-    "dayjs": "^1.8.28",
-    "random": "^2.2.0"
+    "cron": "^3.1.6",
+    "dayjs": "^1.11.10"
   },
   "devDependencies": {
-    "eslint": "^7.3.1",
-    "mocha": "^8.1.1",
-    "node-red": "^1.2.9",
-    "node-red-node-test-helper": "^0.2.5"
+    "eslint": "^8.52.0",
+    "mocha": "^10.2.0",
+    "node-red": "^3.1.0",
+    "node-red-node-test-helper": "^0.3.2"
   },
   "prettier": {
     "trailingComma": "es5",

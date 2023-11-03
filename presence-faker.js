@@ -91,13 +91,13 @@ module.exports = function (RED) {
         setNodeStatus(`next cycle: ${begin.format('HH:mm')}`)
       }
 
-      windowBeginCron = new CronJob({
+      windowBeginCron = CronJob.from({
         cronTime: `0 ${begin.minute()} ${begin.hour()} * * *`, // sec min hour dom month dow
         onTick: windowBeginCronCallback,
       })
       windowBeginCron.start()
 
-      windowEndCron = new CronJob({
+      windowEndCron = CronJob.from({
         cronTime: `0 ${end.minute()} ${end.hour()} * * *`, // sec min hour dom month dow
         // cronTime: fakeCronTime,
         onTick: () => {
@@ -115,7 +115,7 @@ module.exports = function (RED) {
 
     const scheduleMsgCrons = function (schedule) {
       msgCrons = schedule.map((block) => {
-        const cron = new CronJob({
+        const cron = CronJob.from({
           cronTime: block.begin.toDate(),
           onTick: () => {
             executeBlock(block)

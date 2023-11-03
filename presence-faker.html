@@ -460,52 +460,46 @@
   </div>
 </script>
 
-<script type="text/x-red" data-help-name="presence-faker">
-      <p>This node can pretend that your home is occupied by switching devices (e.g. lights) on and off at random times.</p>
-      <h3>Inputs</h3>
-        <dl class="message-properties">
-          <dt>payload
-              <span class="property-type">bool</span>
-          </dt>
-        </dl>
-      <h3>Outputs</h3>
-        <dl class="message-properties">
-          <dt>payload
-              <span class="property-type">string | bool | number | obj</span>
-          </dt>
-          <dt>topic
-            <span class="property-type">string</span>
-        </dt>
-        </dl>
-      <h3>Details</h3>
-      <p>
-        By default the node does nothing unless it receives <code>true</code> as an incoming <code>msg.payload</code>,
-        which will activate the node and generate a random schedule of ON / OFF events. Those will be ejected over time as outgoing
-        messages with <code>payload</code> and <code>topic</code> as specified in the node properties.
-      </p>
-      <p>
-        You can also configure the node to start up enabled in order not to require an incoming activation message.
-      <p>
-        Once the node receives a message with <code>msg.payload</code> of <code>false</code> it will get disabled. You can configure
-        whether or not and what kind of message the node should eject in this case.
-      </p>
-      <p>
-        The configuration can also be overwritten at runtime by passing a config object as msg.payload to the presence-faker node.
-        All attributes are optional.
+<script type="text/markdown" data-help-name="presence-faker">
+This node simulates home occupancy by intermittently activating and deactivating devices (e.g. lights) at random intervals.
 
-        <pre>
-  {
-      "windowBegin": "00:00",  //string
-      "windowEnd": "23:59:59", //string
-      "minDuration": 60,       //seconds as int
-      "maxDuration": 600,      //seconds as int
-      "minCount": 10,          //int
-      "maxCount": 30           //int
-  }
-        </pre>
-      </p>
-      <p>
-          Enabling / disabling the node would typically be triggered by your home automation system, e.g. based on
-          occupation status of your home, LUX sensors, sunset etc.
-      </p>
+### Inputs
+
+: payload (string | obj) : `true` to enable or `false` to disable the presence-faker node, or an `object` to configure it.
+
+### Outputs
+
+: payload (string | bool | number | obj) : the output of the presence-faker node.
+
+### Details
+
+By default, this node remains inactive until it receives a `true` value in the incoming `msg.payload`.
+When activated, it generates a random schedule of ON/OFF events, which are then transmitted as outgoing messages.
+You can specify the payload and topic for these messages in the node properties.
+
+Additionally, you have the option to configure the node to start up in an enabled state, eliminating the need
+for an incoming activation message.
+
+When the node receives a `false` value in the `msg.payload`, it deactivates itself. You can further customize the
+behavior in this situation, including the type of message to be sent.
+
+Runtime configuration adjustments are possible by passing an optional configuration object as `msg.payload` to
+the presence-faker node. The following attributes can be included:
+
+- `windowBegin`: Starting time (e.g., "00:00")
+- `windowEnd`: Ending time (e.g., "23:59:59")
+- `minDuration`: Minimum event duration (in seconds)
+- `maxDuration`: Maximum event duration (in seconds)
+- `minCount`: Minimum event count
+- `maxCount`: Maximum event count
+
+The activation and deactivation of the node are typically triggered by your home automation system, such as
+based on home occupancy status, LUX sensor readings, sunset times, and more.
+
+### Combining presence-faker with suncron
+
+You can combine the presence-faker node with the [suncron node](https://www.npmjs.com/package/node-red-contrib-suncron)
+in order to dynamically set `windowBegin` and/or `windowEnd` based on the position of the sun:
+
+- [Example](https://gist.github.com/csuermann/604f846f4b7bc3a518dc6385c16e3a48)
 </script>
