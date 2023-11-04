@@ -23,10 +23,14 @@
   "scripts": {
     "test": "mocha \"test/**/*_spec.js\""
   },
+  "engines": {
+    "node": ">=12.0.0"
+  },
   "node-red": {
     "nodes": {
       "presence-faker": "presence-faker.js"
-    }
+    },
+    "version": ">=2.1.0"
   },
   "dependencies": {
     "cron": "^3.1.6",
