@@ -18,7 +18,7 @@
   "type": "commonjs",
   "repository": {
     "type": "git",
-    "url": "https://github.com/csuermann/presence-faker"
+    "url": "git+https://github.com/csuermann/presence-faker.git"
   },
   "scripts": {
     "test": "mocha \"test/**/*_spec.js\""
