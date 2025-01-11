@@ -18,7 +18,7 @@
   "type": "commonjs",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/csuermann/presence-faker.git"
+    "url": "git+https://github.com/csuermann/node-red-contrib-presence-faker.git"
   },
   "scripts": {
     "test": "mocha \"test/**/*_spec.js\""
