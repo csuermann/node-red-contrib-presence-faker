@@ -94,8 +94,8 @@ module.exports = function (RED) {
       windowBeginCron = CronJob.from({
         cronTime: `0 ${begin.minute()} ${begin.hour()} * * *`, // sec min hour dom month dow
         onTick: windowBeginCronCallback,
+        start: true,
       })
-      windowBeginCron.start()
 
       windowEndCron = CronJob.from({
         cronTime: `0 ${end.minute()} ${end.hour()} * * *`, // sec min hour dom month dow
@@ -103,8 +103,8 @@ module.exports = function (RED) {
         onTick: () => {
           setNodeStatus('cycle completed')
         },
+        start: true,
       })
-      windowEndCron.start()
 
       debug(
         `window crontabs set up for ${begin.format('HH:mm')} and ${end.format(

@@ -33,14 +33,14 @@
     "version": ">=2.1.0"
   },
   "dependencies": {
-    "cron": "^3.1.6",
-    "dayjs": "^1.11.10"
+    "cron": "^3.5.0",
+    "dayjs": "^1.11.13"
   },
   "devDependencies": {
-    "eslint": "^8.52.0",
-    "mocha": "^10.2.0",
-    "node-red": "^3.1.0",
-    "node-red-node-test-helper": "^0.3.2"
+    "eslint": "^9.18.0",
+    "mocha": "^11.0.1",
+    "node-red": "^4.0.8",
+    "node-red-node-test-helper": "^0.3.4"
   },
   "prettier": {
     "trailingComma": "es5",
